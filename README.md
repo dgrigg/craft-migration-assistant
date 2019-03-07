@@ -15,7 +15,7 @@ Related: [Migration Manager for Craft 2.x](https://github.com/Firstborn/Craft-CM
 ### Composer Command Line (the manual way)
 
 - Go to the command line and `cd` to your project's root folder
-- Download the plugin via composer `composer require dgrigg/craft-migration-manager-pro`
+- Download the plugin via composer `composer require dgrigg/migrationmanagerpro`
 - In the Craft Control Panel, go to Settings -> Plugins
 - Click the "Install" button for Migration Manager Pro
 
