@@ -1,6 +1,6 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 
 /**
  * Interface MigrationManager_IMigrationService

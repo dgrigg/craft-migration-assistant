@@ -1,12 +1,12 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 
 use Craft;
 use craft\elements\Category;
 use craft\models\CategoryGroup;
 use craft\models\CategoryGroup_SiteSettings;
-use dgrigg\migrationmanagerpro\events\ExportEvent;
+use dgrigg\migrationassistant\events\ExportEvent;
 
 class Categories extends BaseMigration
 {

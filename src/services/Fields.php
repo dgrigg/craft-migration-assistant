@@ -1,14 +1,14 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 
 use Craft;
 use craft\models\FieldGroup;
 use craft\db\Query;
 use yii\base\Event;
-use dgrigg\migrationmanagerpro\events\ImportEvent;
-use dgrigg\migrationmanagerpro\events\ExportEvent;
-use dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper;
+use dgrigg\migrationassistant\events\ImportEvent;
+use dgrigg\migrationassistant\events\ExportEvent;
+use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
 
 class Fields extends BaseMigration
 {

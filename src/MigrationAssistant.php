@@ -1,6 +1,6 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro;
+namespace dgrigg\migrationassistant;
 
 use Craft;
 use craft\base\Element;
@@ -17,22 +17,22 @@ use craft\web\View;
 use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
 
-use dgrigg\migrationmanagerpro\assetbundles\cpsidebar\CpSideBarAssetBundle;
-use dgrigg\migrationmanagerpro\assetbundles\cpglobals\CpGlobalsAssetBundle;
-use dgrigg\migrationmanagerpro\actions\MigrateCategoryElementAction;
-use dgrigg\migrationmanagerpro\actions\MigrateEntryElementAction;
-use dgrigg\migrationmanagerpro\actions\MigrateUserElementAction;
-use dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper;
-use dgrigg\migrationmanagerpro\variables\MigrationManagerVariable;
+use dgrigg\migrationassistant\assetbundles\cpsidebar\CpSideBarAssetBundle;
+use dgrigg\migrationassistant\assetbundles\cpglobals\CpGlobalsAssetBundle;
+use dgrigg\migrationassistant\actions\MigrateCategoryElementAction;
+use dgrigg\migrationassistant\actions\MigrateEntryElementAction;
+use dgrigg\migrationassistant\actions\MigrateUserElementAction;
+use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
+use dgrigg\migrationassistant\variables\MigrationManagerVariable;
 
 
 /**
- * Migration Manager plugin for Craft CMS
+ * Migration Assistant plugin for Craft CMS
  *
  * Create Craft migrations to easily migrate settings and content between website environments.
  *
  * @author    Derrick Grigg
- * @copyright Copyright (c) 2018 Firstborn
+ * @copyright Copyright (c) 2018 DGrigg Development Inc.
  * @link      https://firstborn.com
  * @package   MigrationManager
  * @since     1.0.0
@@ -40,7 +40,7 @@ use dgrigg\migrationmanagerpro\variables\MigrationManagerVariable;
 
 
 
-class MigrationManagerPro extends Plugin
+class MigrationAssistant extends Plugin
 {
 
     // Static Properties
@@ -76,22 +76,22 @@ class MigrationManagerPro extends Plugin
         self::$plugin = $this;
 
         $this->setComponents([
-            'migrations' => \dgrigg\migrationmanagerpro\services\Migrations::class,
-            'sites' => \dgrigg\migrationmanagerpro\services\Sites::class,
-            'fields' => \dgrigg\migrationmanagerpro\services\Fields::class,
-            'sections' => \dgrigg\migrationmanagerpro\services\Sections::class,
-            'assetVolumes' => \dgrigg\migrationmanagerpro\services\AssetVolumes::class,
-            'assetTransforms' => \dgrigg\migrationmanagerpro\services\AssetTransforms::class,
-            'globals' => \dgrigg\migrationmanagerpro\services\Globals::class,
-            'tags' => \dgrigg\migrationmanagerpro\services\Tags::class,
-            'categories' => \dgrigg\migrationmanagerpro\services\Categories::class,
-            'routes' => \dgrigg\migrationmanagerpro\services\Routes::class,
-            'userGroups' => \dgrigg\migrationmanagerpro\services\UserGroups::class,
-            'systemMessages' => \dgrigg\migrationmanagerpro\services\SystemMessages::class,
-            'categoriesContent' => \dgrigg\migrationmanagerpro\services\CategoriesContent::class,
-            'entriesContent' => \dgrigg\migrationmanagerpro\services\EntriesContent::class,
-            'globalsContent' => \dgrigg\migrationmanagerpro\services\GlobalsContent::class,
-            'usersContent' => \dgrigg\migrationmanagerpro\services\UsersContent::class,
+            'migrations' => \dgrigg\migrationassistant\services\Migrations::class,
+            'sites' => \dgrigg\migrationassistant\services\Sites::class,
+            'fields' => \dgrigg\migrationassistant\services\Fields::class,
+            'sections' => \dgrigg\migrationassistant\services\Sections::class,
+            'assetVolumes' => \dgrigg\migrationassistant\services\AssetVolumes::class,
+            'assetTransforms' => \dgrigg\migrationassistant\services\AssetTransforms::class,
+            'globals' => \dgrigg\migrationassistant\services\Globals::class,
+            'tags' => \dgrigg\migrationassistant\services\Tags::class,
+            'categories' => \dgrigg\migrationassistant\services\Categories::class,
+            'routes' => \dgrigg\migrationassistant\services\Routes::class,
+            'userGroups' => \dgrigg\migrationassistant\services\UserGroups::class,
+            'systemMessages' => \dgrigg\migrationassistant\services\SystemMessages::class,
+            'categoriesContent' => \dgrigg\migrationassistant\services\CategoriesContent::class,
+            'entriesContent' => \dgrigg\migrationassistant\services\EntriesContent::class,
+            'globalsContent' => \dgrigg\migrationassistant\services\GlobalsContent::class,
+            'usersContent' => \dgrigg\migrationassistant\services\UsersContent::class,
         ]);
 
         // Register our CP routes
@@ -99,9 +99,9 @@ class MigrationManagerPro extends Plugin
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function (RegisterUrlRulesEvent $event) {
-                $event->rules['migrationmanagerpro/migrations'] = 'migrationmanagerpro/cp/migrations';
-                $event->rules['migrationmanagerpro/create'] = 'migrationmanagerpro/cp/index';
-                $event->rules['migrationmanagerpro'] = 'migrationmanagerpro/cp/index';
+                $event->rules['migrationassistant/migrations'] = 'migrationassistant/cp/migrations';
+                $event->rules['migrationassistant/create'] = 'migrationassistant/cp/index';
+                $event->rules['migrationassistant'] = 'migrationassistant/cp/index';
             }
         );
 
@@ -112,7 +112,7 @@ class MigrationManagerPro extends Plugin
             function (Event $event) {
                /** @var CraftVariable $variable */
                $variable = $event->sender;
-               $variable->set('migrationManagerPro', MigrationManagerVariable::class);
+               $variable->set('migrationassistant', MigrationManagerVariable::class);
             }
          );
    
@@ -143,7 +143,7 @@ class MigrationManagerPro extends Plugin
           UserPermissions::class,
           UserPermissions::EVENT_REGISTER_PERMISSIONS,
           function(RegisterUserPermissionsEvent $event) {
-             $event->permissions['Migration Manager'] = [
+             $event->permissions['Migration Assistant'] = [
                 'createContentMigrations' => [
                    'label' => 'Create content migrations',
                 ],
@@ -162,10 +162,11 @@ class MigrationManagerPro extends Plugin
     public function getCpNavItem()
     {
         $item = parent::getCpNavItem();
+        //$item['label'] = 'Migrations';
         $item['badgeCount'] = $this->getBadgeCount();
         $item['subnav'] = [
-            'create' => ['label' => 'Create', 'url' => 'migrationmanagerpro'],
-            'migrations' => ['label' => 'Migrations', 'url' => 'migrationmanagerpro/migrations']
+            'create' => ['label' => 'Create', 'url' => 'migrationassistant'],
+            'migrations' => ['label' => 'Migrations', 'url' => 'migrationassistant/migrations']
         ];
         return $item;
     }

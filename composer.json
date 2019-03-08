@@ -1,22 +1,23 @@
 {
-  "name": "dgrigg/craft-migrationmanagerpro",
-  "description": "Quickly create migrations for settings and content at the click of a mouse.",
-  "version": "3.1.2",
+  "name": "dgrigg/craft-migration-assistant",
+  "description": "Create migrations for settings and content at the click of a mouse. Keep environments in sync with ease.",
+  "version": "3.1.0",
   "keywords": [
     "craft",
     "cms",
     "craftcms",
-    "craft-plugin",
+    "craft plugin",
     "migration",
-    "migration-manager"
+    "migration manager",
+    "migration assistant"
   ],
   "authors": [{
     "name": "Derrick Grigg",
     "email": "derrick@dgrigg.com"
   }],
   "support": {
-    "docs": "https://github.com/dgrigg/craft-migration-manager-pro/blob/master/README.md",
-    "issues": "https://github.com/dgrigg/craft-migration-manager-pro/issues"
+    "docs": "https://github.com/dgrigg/craft-migration-assistant/blob/master/README.md",
+    "issues": "https://github.com/dgrigg/craft-migration-assistant/issues"
   },
   "license": "proprietary",
   "type": "craft-plugin",
@@ -25,17 +26,17 @@
   },
   "autoload": {
     "psr-4": {
-      "dgrigg\\migrationmanagerpro\\": "src/"
+      "dgrigg\\migrationassistant\\": "src/"
     }
   },
   "extra": {
-    "name": "Migration Manager Pro",
-    "handle": "migrationmanagerpro",
+    "name": "Migration Assistant",
+    "handle": "migrationassistant",
     "developer": "DGrigg Dev Inc.",
     "developerUrl": "https://dgrigg.com",
-    "class": "dgrigg\\migrationmanagerpro\\MigrationManagerPro",
+    "class": "dgrigg\\migrationassistant\\MigrationAssistant",
     "hasCpSettings": false,
     "hasCpSection": true,
-    "changelogUrl": "https://raw.githubusercontent.com/dgrigg/craft-migration-manager-pro/master/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/dgrigg/craft-migration-assistant/master/CHANGELOG.md"
   }
 }

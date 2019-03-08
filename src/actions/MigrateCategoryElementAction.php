@@ -1,7 +1,7 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\actions;
-use dgrigg\migrationmanagerpro\MigrationManagerPro;
+namespace dgrigg\migrationassistant\actions;
+use dgrigg\migrationassistant\MigrationAssistant;
 use Craft;
 use craft\base\ElementAction;
 use craft\elements\db\ElementQueryInterface;
@@ -31,7 +31,7 @@ class MigrateCategoryElementAction extends ElementAction
             $params['category'][] = $element->id;
         }
 
-        if (MigrationManagerPro::getInstance()->migrations->createContentMigration($params)) {
+        if (MigrationAssistant::getInstance()->migrations->createContentMigration($params)) {
 
             $this->setMessage(Craft::t('app', 'Migration created.'));
             return true;

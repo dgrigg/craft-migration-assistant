@@ -1,10 +1,10 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 
-use dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper;
-use dgrigg\migrationmanagerpro\events\ExportEvent;
-use dgrigg\migrationmanagerpro\events\ImportEvent;
+use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
+use dgrigg\migrationassistant\events\ExportEvent;
+use dgrigg\migrationassistant\events\ImportEvent;
 use Craft;
 use craft\fields\BaseOptionsField;
 use craft\fields\BaseRelationField;
@@ -379,19 +379,19 @@ abstract class BaseContentMigration extends BaseMigration
                 $func = null;
                 switch ($elementType) {
                     case 'craft\elements\Asset':
-                         $func = 'dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper::getAssetByHandle';
+                         $func = 'dgrigg\migrationassistant\helpers\MigrationManagerHelper::getAssetByHandle';
                         break;
                     case 'craft\elements\Category':
-                        $func = 'dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper::getCategoryByHandle';
+                        $func = 'dgrigg\migrationassistant\helpers\MigrationManagerHelper::getCategoryByHandle';
                         break;
                     case 'craft\elements\Entry':
-                        $func = 'dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper::getEntryByHandle';
+                        $func = 'dgrigg\migrationassistant\helpers\MigrationManagerHelper::getEntryByHandle';
                         break;
                     case 'craft\elements\Tag':
-                        $func = 'dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper::getTagByHandle';
+                        $func = 'dgrigg\migrationassistant\helpers\MigrationManagerHelper::getTagByHandle';
                         break;
                     case 'craft\elements\User':
-                        $func = 'dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper::getUserByHandle';
+                        $func = 'dgrigg\migrationassistant\helpers\MigrationManagerHelper::getUserByHandle';
                         break;
                     default:
                         break;

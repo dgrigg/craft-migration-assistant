@@ -1,10 +1,10 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 
 use Craft;
 use craft\elements\GlobalSet;
-use dgrigg\migrationmanagerpro\events\ExportEvent;
+use dgrigg\migrationassistant\events\ExportEvent;
 
 class Globals extends BaseMigration
 {

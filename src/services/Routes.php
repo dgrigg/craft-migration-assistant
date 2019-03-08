@@ -1,8 +1,8 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 
-use dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper;
+use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
 use Craft;
 use craft\db\Query;
 

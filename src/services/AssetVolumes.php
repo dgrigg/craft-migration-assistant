@@ -1,9 +1,9 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 
 use Craft;
-use dgrigg\migrationmanagerpro\events\ExportEvent;
+use dgrigg\migrationassistant\events\ExportEvent;
 use craft\elements\Asset;
 use craft\volumes\Local;
 use craft\volumes\MissingVolume;

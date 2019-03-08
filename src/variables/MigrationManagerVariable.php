@@ -1,7 +1,7 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\variables;
-use dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper;
+namespace dgrigg\migrationassistant\variables;
+use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
 
 /**
  * Deploy Variable provides access to database objects from templates

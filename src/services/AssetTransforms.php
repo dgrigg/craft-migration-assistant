@@ -1,10 +1,10 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 
 use Craft;
 use craft\models\AssetTransform;
-use dgrigg\migrationmanagerpro\events\ExportEvent;
+use dgrigg\migrationassistant\events\ExportEvent;
 
 class AssetTransforms extends BaseMigration
 {

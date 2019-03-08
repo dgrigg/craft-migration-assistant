@@ -10,7 +10,7 @@ namespace Craft;
 /**
  * Generated migration
  */
-class m170621_190506_migrationmanagerpro_import extends BaseMigration
+class m170621_190506_migrationassistant_import extends BaseMigration
 {
     /**
      * Any migration code in here is wrapped inside of a transaction.

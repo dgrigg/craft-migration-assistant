@@ -1,5 +1,5 @@
 <?php
-namespace dgrigg\migrationmanagerpro\assetbundles\cp;
+namespace dgrigg\migrationassistant\assetbundles\cp;
 
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;

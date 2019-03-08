@@ -1,12 +1,12 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 
-use dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper;
+use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
 use Craft;
 use craft\elements\User;
 use craft\models\UserGroup;
-use dgrigg\migrationmanagerpro\events\ExportEvent;
+use dgrigg\migrationassistant\events\ExportEvent;
 
 class UserGroups extends BaseMigration
 {

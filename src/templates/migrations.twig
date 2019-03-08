@@ -1,10 +1,10 @@
-{% extends 'migrationManagerpro/_layouts/cp' %}
+{% extends 'migrationassistant/_layouts/cp' %}
 
 {% set title = 'Migrations'|t %}
 
 {% set crumbs = [
-    { label: 'Migration Manager', url: url('migrationmanagerpro') },
-    { label: 'Migrations'|t, url: url('migrationmanagerpro/migrations') }
+    { label: 'Migration Assistant', url: url('migrationassistant') },
+    { label: 'Migrations'|t, url: url('migrationassistant/migrations') }
 ] %}
 
 {% set tabs = {} %}
@@ -22,7 +22,7 @@
         </p>
 
         <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
-            <input type="hidden" name="action" value="migrationmanagerpro/migrations/start">
+            <input type="hidden" name="action" value="migrationassistant/migrations/start">
             {{ csrfInput() }}
 
             {% for migration in pending %}
@@ -56,7 +56,7 @@
             </p>
 
             <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
-                <input type="hidden" name="action" value="migrationmanagerpro/migrations/rerun">
+                <input type="hidden" name="action" value="migrationassistant/migrations/rerun">
                 {{ csrfInput() }}
 
 
@@ -82,5 +82,5 @@
     </div>
 {% endblock %}
 
-{% do view.registerAssetBundle("dgrigg\\migrationmanagerpro\\assetbundles\\cp\\CpAssetBundle") %}
+{% do view.registerAssetBundle("dgrigg\\migrationassistant\\assetbundles\\cp\\CpAssetBundle") %}
 

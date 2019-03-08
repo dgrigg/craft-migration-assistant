@@ -1,12 +1,12 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 
 use Craft;
 use craft\base\Component;
 use craft\base\Element;
-use dgrigg\migrationmanagerpro\events\ExportEvent;
-use dgrigg\migrationmanagerpro\events\ImportEvent;
+use dgrigg\migrationassistant\events\ExportEvent;
+use dgrigg\migrationassistant\events\ImportEvent;
 
 /**
  * Class MigrationManager_BaseMigrationService

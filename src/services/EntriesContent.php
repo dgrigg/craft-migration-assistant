@@ -1,6 +1,6 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 use Craft;
 use craft\elements\Entry;
 use craft\helpers\DateTimeHelper;

@@ -1,6 +1,6 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\helpers;
+namespace dgrigg\migrationassistant\helpers;
 
 use Craft;
 use craft\models\FolderCriteria;

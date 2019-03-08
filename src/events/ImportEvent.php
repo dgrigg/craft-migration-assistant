@@ -1,6 +1,6 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\events;
+namespace dgrigg\migrationassistant\events;
 
 use craft\events\CancelableEvent;
 use yii\base\Component;

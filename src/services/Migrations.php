@@ -1,6 +1,6 @@
 <?php
 
-namespace dgrigg\migrationmanagerpro\services;
+namespace dgrigg\migrationassistant\services;
 
 use Craft;
 use craft\base\Component;
@@ -8,8 +8,8 @@ use craft\helpers\App;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use craft\errors\MigrationException;
-use dgrigg\migrationmanagerpro\MigrationManagerPro;
-use dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper;
+use dgrigg\migrationassistant\MigrationAssistant;
+use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
 use DateTime;
 
 class Migrations extends Component
@@ -70,7 +70,7 @@ class Migrations extends Component
         //build a list of dependencies first to avoid potential cases where items are requested by fields before being created
         //export them without additional fields to prevent conflicts with missing fields, field tabs can be added on the second pass
         //after all the fields have been created
-        $plugin = MigrationManagerPro::getInstance();
+        $plugin = MigrationAssistant::getInstance();
 
         foreach ($this->_settingsDependencyTypes as $key => $value) {
             $service = $plugin->get($value);
@@ -141,7 +141,7 @@ class Migrations extends Component
         );
 
         $empty = true;
-        $plugin = MigrationManagerPro::getInstance();
+        $plugin = MigrationAssistant::getInstance();
 
         foreach ($this->_contentMigrationTypes as $key => $value) {
             $service = $plugin->get($value);
@@ -222,7 +222,7 @@ class Migrations extends Component
         //escape backslashes
         //$migration = str_replace('\\', '\\\\', $migration);
 
-        $content = Craft::$app->view->renderTemplate('migrationmanagerpro/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
+        $content = Craft::$app->view->renderTemplate('migrationassistant/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
 
         FileHelper::writeToFile($path, $content);
 
@@ -245,7 +245,7 @@ class Migrations extends Component
             Craft::error(json_last_error_msg(), __METHOD__);
         }
 
-        $plugin = MigrationManagerPro::getInstance();
+        $plugin = MigrationAssistant::getInstance();
         if (array_key_exists('settings', $data)) {
             // run through dependencies first to create any elements that need to be in place for fields, field layouts and other dependencies
             foreach ($this->_settingsDependencyTypes as $key => $value) {

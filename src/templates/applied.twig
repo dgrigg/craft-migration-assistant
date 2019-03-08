@@ -1,11 +1,11 @@
-{% extends 'migrationmanagerpro/_layouts/cp' %}
+{% extends 'migrationassistant/_layouts/cp' %}
 
 {% set title = 'Applied Migrations'|t %}
 
 {% set crumbs = [
-    { label: craft.migrationManager.name, url: url('migrationmanagerpro') },
-    { label: 'Pending Migrations'|t, url: url('migrationmanagerpro/pending') },
-    { label: 'Applied Migrations'|t, url: url('migrationmanagerpro/applied') }
+    { label: craft.migrationManager.name, url: url('migrationassistant') },
+    { label: 'Pending Migrations'|t, url: url('migrationassistant/pending') },
+    { label: 'Applied Migrations'|t, url: url('migrationassistant/applied') }
 ] %}
 
 {% block content %}
@@ -17,8 +17,8 @@
         </p>
 
         <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
-            <input type="hidden" name="action" value="migrationmanagerpro/migrations/start">
-            <input type="hidden" name="nextAction" value="migrationmanagerpro/migrations/rerun">
+            <input type="hidden" name="action" value="migrationassistant/migrations/start">
+            <input type="hidden" name="nextAction" value="migrationassistant/migrations/rerun">
             <input type="hidden" name="applied" value="1">
             {{ csrfInput() }}
 
@@ -45,4 +45,4 @@
 
 {% endblock %}
 
-{% includeCssResource "migrationmanagerpro/css/styles.css" %}
+{% includeCssResource "migrationassistant/css/styles.css" %}

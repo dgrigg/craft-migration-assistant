@@ -7,8 +7,8 @@
 
 
 {% set crumbs = [
-{ label: 'Migration Manager', url: url('migrationmanagerpro') },
-{ label: 'Create Migration'|t, url: url('migrationmanagerpro/create') }
+{ label: 'Migration Assistant', url: url('migrationassistant') },
+{ label: 'Create Migration'|t, url: url('migrationassistant/create') }
 ] %}
 
 {% set tabs = {} %}
@@ -62,7 +62,7 @@
     {% endif %}
 {% endif %}
 
-{% if craft.migrationManagerPro.isVersion('3.1') == false %}
+{% if craft.migrationassistant.isVersion('3.1') == false %}
     {% set other = { label: 'Other Settings'|t, url: '#other' } %}  
     {% set tabs = tabs | merge({ other: other }) %}
 {% endif %}
@@ -71,14 +71,14 @@
 
 {% set content %}
     <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
-        <input type="hidden" name="action" value="migrationmanagerpro/migrations/create-migration">
+        <input type="hidden" name="action" value="migrationassistant/migrations/create-migration">
         {{ csrfInput() }}
 
         {% set firstRendered = false %}
         {% for tabHandle, tab in tabs %}
             {% if attribute(_context, tabHandle) is not empty %}
                 <div id="{{ tabHandle }}"{% if firstRendered %} class="hidden"{% endif %}>
-                    {% include 'migrationmanagerpro/types/' ~ tabHandle %}
+                    {% include 'migrationassistant/types/' ~ tabHandle %}
                 </div>
                 {% set firstRendered = true %}
             {% endif %}
@@ -119,7 +119,7 @@
     </form>
 {% endset %}
 
-{% do view.registerAssetBundle("dgrigg\\migrationmanagerpro\\assetbundles\\cp\\CpAssetBundle") %}
+{% do view.registerAssetBundle("dgrigg\\migrationassistant\\assetbundles\\cp\\CpAssetBundle") %}
 {% js %}
 new Craft.MigrationManagerExport();
 {% endjs %}

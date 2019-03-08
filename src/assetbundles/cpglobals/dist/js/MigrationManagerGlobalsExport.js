@@ -13,7 +13,7 @@
 
     createMigration: function(evt) {
       $('form input[name="action"]').val(
-        "migrationmanagerpro/migrations/create-globals-content-migration"
+        "migrationassistant/migrations/create-globals-content-migration"
       );
       $("#main form").submit();
       console.log($('form input[name="action"]').val());
