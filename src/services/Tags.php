@@ -1,11 +1,11 @@
 <?php
 
-namespace dgrigg\migrationmanager\services;
+namespace dgrigg\migrationmanagerpro\services;
 
 use Craft;
 use craft\elements\Tag;
 use craft\models\TagGroup;
-use dgrigg\migrationmanager\events\ExportEvent;
+use dgrigg\migrationmanagerpro\events\ExportEvent;
 
 class Tags extends BaseMigration
 {

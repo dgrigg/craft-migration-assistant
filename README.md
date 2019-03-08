@@ -2,6 +2,7 @@
 
 Create migrations to easily move settings and content between CraftCMS website installations with the click of a mouse, no coding required. You can select which elements to migrate and create a native Craft content migration file that can be committed to your version control system. The migration(s) can then be applied on different CraftCMS installations to instantly create and update settings and content, without needing to enter data multiple times. By using migrations you can ensure your various website environments (local, staging, production, etc.) stay in sync and up to date.
 
+Related: [Migration Manager for Craft 3.x](https://github.com/Firstborn/Craft-Migration-Manager)
 Related: [Migration Manager for Craft 2.x](https://github.com/Firstborn/Craft-CMS-Migration-Manager)
 
 ## Installation
@@ -43,7 +44,15 @@ To create a migration select the elements you wish to migrate and then click the
 
 ![Migration Manager](screenshots/create-migration.png)
 
-It is important to remember to create Migrations in an order that is consistent with manually creating fields, sections etc. Fields must exist before they can be added to Sections. Categories must exist before they can be used by Fields, etc. When creating migrations keep that in mind, break your migrations into smaller steps to prevent issues instead of one large migration.
+It is important to remember to create Migrations in an order that is consistent with manually creating sites, fields, sections etc. Fields must exist before they can be added to Sections. Categories must exist before they can be used by Fields, etc. When creating migrations keep that in mind, break your migrations into smaller steps to prevent issues instead of one large migration.
+
+A good rule to follow for migration dependency order is:
+
+1. Sites/locales
+2. Sections
+3. Asset Volumes
+4. Categories
+5. Fields
 
 A migration file will be created in the `craft/migrations` folder. The migration filename will contain the slugs/handles of the migrated items. Move the new migration file to your destination environment, ideally with version control.
 
@@ -67,7 +76,7 @@ When new migration(s) are in your destination environment a badge will appear to
 
 The MigrationManager uses Craft's built in migrator to run migrations. Failed migrations will be rolled back and the database will be returned to it's pre migration state. You can check both the Craft logs to see details on why the migration failed. In many instances it's simply a case of a migration having dependencies (ie required fields) that have not been setup on the destination site or a missing plugin.
 
-You can also view previously applied migrations by clicking the 'Applied' tab on the MigrationManager/Migrations page. This will show you migrations that have already been applied and migrations that were created locally (and don't need to be run locally). Note that if you create [blank migrations](#custom-migrations) (by clicking the Create Migration button without selecting elements) they will show up in the New Migrations list, so that you have a chance to test and run them locally with your custom migration code.
+You can also view previously applied migrations by clicking the 'Applied' tab on the migrationmanagerpro/Migrations page. This will show you migrations that have already been applied and migrations that were created locally (and don't need to be run locally). Note that if you create [blank migrations](#custom-migrations) (by clicking the Create Migration button without selecting elements) they will show up in the New Migrations list, so that you have a chance to test and run them locally with your custom migration code.
 
 ## Field type support
 
@@ -190,6 +199,17 @@ To learn more about creating custom migrations:
 
 - [Craft CMS Official - Content Migrations](https://docs.craftcms.com/v3/content-migrations.html#creating-migrations)
 - [Craft CMS 3 Content Migration Examples](https://medium.com/mikethehud/craft-cms-3-content-migration-examples-3a377f6420c3)
+
+## Upgrading from Migration Manager
+
+Migration Manager Pro replaces [Migration Manager](https://github.com/Firstborn/Craft-Migration-Manager). Before installing Migration Manager Pro you should remove Migration Manager from your Craft installation. Go to the Settings/Plugins and uninstall Migration Manager. Make sure you also remove the old package by running `composer remove firstborn/migrationmanager` from your terminal.
+
+If you had previously used the original Migration Manager to create migrations you can run them with Migration Manager Pro. You will need to update the generated migration file(s) in the `{root}/migrations' folder with the following change
+
+```
+//use firstborn\migrationmanager\MigrationManager;
+use dgrigg\migrationmanagerpro\MigrationManagerPro as MigrationManager;
+```
 
 #### Credits
 

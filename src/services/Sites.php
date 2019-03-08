@@ -1,12 +1,12 @@
 <?php
 
-namespace dgrigg\migrationmanager\services;
+namespace dgrigg\migrationmanagerpro\services;
 
 use Craft;
 use craft\models\Site;
 use craft\models\SiteGroup;
 use craft\db\Query;
-use dgrigg\migrationmanager\events\ExportEvent;
+use dgrigg\migrationmanagerpro\events\ExportEvent;
 
 
 class Sites extends BaseMigration

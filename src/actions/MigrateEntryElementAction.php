@@ -1,8 +1,8 @@
 <?php
 
 
-namespace dgrigg\migrationmanager\actions;
-use dgrigg\migrationmanager\MigrationManager;
+namespace dgrigg\migrationmanagerpro\actions;
+use dgrigg\migrationmanagerpro\MigrationManagerPro;
 use Craft;
 use craft\base\ElementAction;
 use craft\elements\db\ElementQueryInterface;
@@ -34,7 +34,7 @@ class MigrateEntryElementAction extends ElementAction
             $params['entry'][] = $element;
         }
 
-        if (MigrationManager::getInstance()->migrations->createContentMigration($params)) {
+        if (MigrationManagerPro::getInstance()->migrations->createContentMigration($params)) {
 
             $this->setMessage(Craft::t('app', 'Migration created.'));
             return true;

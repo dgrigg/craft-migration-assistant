@@ -1,6 +1,6 @@
 <?php
 
-namespace dgrigg\migrationmanager\events;
+namespace dgrigg\migrationmanagerpro\events;
 
 use craft\base\Element;
 use yii\base\Event;

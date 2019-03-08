@@ -2,7 +2,7 @@
 namespace craft\contentmigrations;
 
 use craft\db\Migration;
-use dgrigg\migrationmanager\MigrationManager;
+use dgrigg\migrationmanagerpro\MigrationManagerPro;
 
 /**
  * Generated migration
@@ -39,7 +39,7 @@ JSON;
         //add your custom migration code, see the EXAMPLES.md for examples
         return true;
         {% else %}
-        return MigrationManager::getInstance()->migrations->import($this->json);
+        return MigrationManagerPro::getInstance()->migrations->import($this->json);
         {% endif %}
         {% endspaceless %}
     }

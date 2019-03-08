@@ -2,7 +2,7 @@
 
 ## Migration file
 
-To create an empty migration file click the 'Create Migration' button on the Migration Manager/Create Migrations tab. A new empty migration will be added to the `craft/plugins/migrationmanager/migrations/generated` folder.
+To create an empty migration file click the 'Create Migration' button on the Migration Manager Pro/Create Migrations tab. A new empty migration will be added to the `{root}/migrations` folder.
 
 ```php
 namespace Craft;
@@ -10,7 +10,7 @@ namespace Craft;
 /**
  * Generated migration
  */
-class m170621_190506_migrationmanager_import extends BaseMigration
+class m170621_190506_migrationmanagerpro_import extends BaseMigration
 {
     /**
      * Any migration code in here is wrapped inside of a transaction.
@@ -47,6 +47,7 @@ return Craft::$app->sections->deleteSectionById($section->id);
 ```
 
 ### Add a category value
+
 ```php
 $categoryGroup = Craft::$app->categories->getGroupByHandle('category');
 

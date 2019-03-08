@@ -1,7 +1,7 @@
 {
   "name": "dgrigg/craft-migrationmanagerpro",
   "description": "Quickly create migrations for settings and content at the click of a mouse.",
-  "version": "3.1.1.1",
+  "version": "3.1.1.2",
   "keywords": [
     "craft",
     "cms",
@@ -25,7 +25,7 @@
   },
   "autoload": {
     "psr-4": {
-      "dgrigg\\migrationmanager\\": "src/"
+      "dgrigg\\migrationmanagerpro\\": "src/"
     }
   },
   "extra": {
@@ -33,7 +33,7 @@
     "handle": "migrationmanagerpro",
     "developer": "DGrigg Dev Inc.",
     "developerUrl": "https://dgrigg.com",
-    "class": "dgrigg\\migrationmanager\\MigrationManager",
+    "class": "dgrigg\\migrationmanagerpro\\MigrationManagerPro",
     "hasCpSettings": false,
     "hasCpSection": true,
     "changelogUrl": "https://raw.githubusercontent.com/dgrigg/craft-migration-manager-pro/master/CHANGELOG.md"

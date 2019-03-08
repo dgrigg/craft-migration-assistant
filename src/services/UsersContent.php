@@ -1,10 +1,10 @@
 <?php
 
-namespace dgrigg\migrationmanager\services;
+namespace dgrigg\migrationmanagerpro\services;
 
 use Craft;
 use craft\elements\User;
-use dgrigg\migrationmanager\helpers\MigrationManagerHelper;
+use dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper;
 
 class UsersContent extends BaseContentMigration
 {

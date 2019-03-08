@@ -2,6 +2,7 @@ Craft.MigrationManagerRunner = Garnish.Base.extend({
 	$graphic: null,
 	$status: null,
 	$errorDetails: null,
+	$errors: null,
 	data: null,
 
 	init: function (data, nextAction) {
@@ -9,6 +10,7 @@ Craft.MigrationManagerRunner = Garnish.Base.extend({
 		this.$status = $('#status');
 		this.data = data;
 		this.postActionRequest(nextAction);
+		this.$errorDetails = '';
 	},
 
 	updateStatus: function (msg) {
@@ -40,6 +42,10 @@ Craft.MigrationManagerRunner = Garnish.Base.extend({
 	onSuccessResponse: function (response) {
 		if (response.data) {
 			this.data = response.data;
+		}
+
+		if (response.errors) {
+			this.$errors = response.errors;
 		}
 
 		if (response.errorDetails) {
@@ -100,7 +106,17 @@ Craft.MigrationManagerRunner = Garnish.Base.extend({
 				errorText += Craft.t('app', 'No files have been updated and the database has not been touched.') + '</p><p>';
 			}
 
-			errorText += this.$errorDetails + '</p>';
+			errorText += '</p>';
+
+			if (this.$errors) {
+				errorText += '<ul>';
+				for (var err in this.$errors) {
+					errorText += '<li>' + this.$errors[err] + '</li>';
+				}
+			}
+			errorText += '</ul>';;
+			errorText += '<p>' + this.$errorDetails + '</p>'
+
 			this.updateStatus(errorText);
 		} else {
 			this.updateStatus(Craft.t('app', 'All done!'));

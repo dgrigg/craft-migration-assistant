@@ -4,7 +4,7 @@
 
 ### News
 
-- [Migration Manager](https://github.com/Firstborn/Craft-Migration-Manager) is now [Migration Manager Pro](https://github.com/dgrigg/migration-manager/pro). We have transitioned to a paid plugin in order to provide better support and updates going forward.
+- [Migration Manager](https://github.com/Firstborn/Craft-Migration-Manager) is now [Migration Manager Pro](https://github.com/dgrigg/craft-migration-manager-pro). We have transitioned to a paid plugin in order to provide better support and updates going forward. As Craft continues to grow and evolve and more people take advantage of simplified migrations via the Migration Manager, it was becoming difficult to provide a level of support and responsiveness that people needed when depending on this plugin to help manage their Craft sites. The current free version of Migration Manager will remain available for a period of time to ensure a smooth transition for everyone using the plugin. Thank you to everyone who used this plugin and offered feedback to make it better.
 
 ## 3.0.21 - 2019-03-05
 

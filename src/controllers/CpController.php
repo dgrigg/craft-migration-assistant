@@ -1,10 +1,10 @@
 <?php
 
-namespace dgrigg\migrationmanager\controllers;
+namespace dgrigg\migrationmanagerpro\controllers;
 
 use Craft;
 use craft\web\Controller;
-use dgrigg\migrationmanager\MigrationManager;
+use dgrigg\migrationmanagerpro\MigrationManagerPro;
 
 /**
  * Class MigrationManagerController
@@ -18,11 +18,11 @@ class CpController extends Controller
 
     public function actionIndex()
     {
-        $outstanding = MigrationManager::getInstance()->getBadgeCount();
+        $outstanding = MigrationManagerPro::getInstance()->getBadgeCount();
         if ($outstanding){
-            Craft::$app->getSession()->setError(Craft::t('migrationmanager','There are pending migrations to run'));
+            Craft::$app->getSession()->setError(Craft::t('migrationmanagerpro','There are pending migrations to run'));
         }
-        return $this->renderTemplate('migrationmanager/index');
+        return $this->renderTemplate('migrationmanagerpro/index');
     }
 
     /**
@@ -33,7 +33,7 @@ class CpController extends Controller
         $migrator = Craft::$app->getContentMigrator();
         $pending = $migrator->getNewMigrations();
         $applied = $migrator->getMigrationHistory();
-        return $this->renderTemplate('migrationmanager/migrations', array('pending' => $pending, 'applied' => $applied));
+        return $this->renderTemplate('migrationmanagerpro/migrations', array('pending' => $pending, 'applied' => $applied));
     }
 
 }

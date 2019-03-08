@@ -1,11 +1,11 @@
-{% extends 'migrationManager/_layouts/cp' %}
+{% extends 'migrationmanagerpro/_layouts/cp' %}
 
 {% set title = 'Applied Migrations'|t %}
 
 {% set crumbs = [
-    { label: craft.migrationManager.name, url: url('migrationmanager') },
-    { label: 'Pending Migrations'|t, url: url('migrationmanager/pending') },
-    { label: 'Applied Migrations'|t, url: url('migrationmanager/applied') }
+    { label: craft.migrationManager.name, url: url('migrationmanagerpro') },
+    { label: 'Pending Migrations'|t, url: url('migrationmanagerpro/pending') },
+    { label: 'Applied Migrations'|t, url: url('migrationmanagerpro/applied') }
 ] %}
 
 {% block content %}
@@ -16,10 +16,9 @@
             {{ 'Select the previously applied migration you want to rerun.'|t }}
         </p>
 
-
         <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
-            <input type="hidden" name="action" value="migrationmanager/migrations/start">
-            <input type="hidden" name="nextAction" value="migrationmanager/migrations/rerun">
+            <input type="hidden" name="action" value="migrationmanagerpro/migrations/start">
+            <input type="hidden" name="nextAction" value="migrationmanagerpro/migrations/rerun">
             <input type="hidden" name="applied" value="1">
             {{ csrfInput() }}
 
@@ -46,4 +45,4 @@
 
 {% endblock %}
 
-{% includeCssResource "migrationmanager/css/styles.css" %}
+{% includeCssResource "migrationmanagerpro/css/styles.css" %}

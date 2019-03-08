@@ -1,5 +1,5 @@
 <?php
-namespace dgrigg\migrationmanager\assetbundles\cpglobals;
+namespace dgrigg\migrationmanagerpro\assetbundles\cpglobals;
 
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
@@ -10,8 +10,7 @@ class CpGlobalsAssetBundle extends AssetBundle
     {
         // define the path that your publishable resources live
         $this->sourcePath = __DIR__.'/dist';
-        //$this->sourcePath = '@firstborn/migrationmanager/assetbundles/';
-
+      
         // define the dependencies
         $this->depends = [
             CpAsset::class,

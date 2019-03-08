@@ -1,14 +1,14 @@
 <?php
 
-namespace dgrigg\migrationmanager\services;
+namespace dgrigg\migrationmanagerpro\services;
 
 use Craft;
 use craft\models\Section;
 use craft\models\Section_SiteSettings;
 use craft\models\EntryType;
 use craft\models\Entry;
-use dgrigg\migrationmanager\events\ExportEvent;
-use dgrigg\migrationmanager\helpers\MigrationManagerHelper;
+use dgrigg\migrationmanagerpro\events\ExportEvent;
+use dgrigg\migrationmanagerpro\helpers\MigrationManagerHelper;
 
 
 class Sections extends BaseMigration

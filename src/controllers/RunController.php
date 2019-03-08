@@ -1,10 +1,10 @@
 <?php
 
-namespace dgrigg\migrationmanager\controllers;
+namespace dgrigg\migrationmanagerpro\controllers;
 
 use Craft;
 use craft\web\Controller;
-use dgrigg\migrationmanager\MigrationManager;
+use dgrigg\migrationmanagerpro\MigrationManagerPro;
 
 /**
  * Class MigrationManager_RunController
@@ -22,7 +22,7 @@ class RunController extends Controller
         return $this->asJson(array(
                 'data' => $request->getParam('data'),
                 'alive' => true,
-                'nextAction' => 'migrationmanager/run/prepare'
+                'nextAction' => 'migrationmanagerpro/run/prepare'
             )
         );
     }
@@ -40,7 +40,7 @@ class RunController extends Controller
         return $this->asJson(array(
             'alive' => true,
             'nextStatus' => Craft::t('app', 'Backing-up database ...'),
-            'nextAction' => 'migrationmanager/run/backup',
+            'nextAction' => 'migrationmanagerpro/run/backup',
             'data' => $data,
         ));
     }
@@ -61,27 +61,28 @@ class RunController extends Controller
                 $db->backup();
                 return $this->asJson(array(
                     'alive' => true,
-                    'nextStatus' => Craft::t('migrationmanager', 'Running migrations ...'),
-                    'nextAction' => 'migrationmanager/run/migrations',
+                    'nextStatus' => Craft::t('migrationmanagerpro', 'Running migrations ...'),
+                    'nextAction' => 'migrationmanagerpro/run/migrations',
                     'data' => $data,
                 ));
 
             } catch (\Throwable $e) {
                 Craft::$app->disableMaintenanceMode();
+                
 
                 return $this->asJson(array(
                     'alive' => true,
                     'errorDetails' => $e->getMessage(),
-                    'nextStatus' => Craft::t('migrationmanager', 'An error was encountered. Rolling back ...'),
-                    'nextAction' => 'migrationmanager/run/rollback',
+                    'nextStatus' => Craft::t('migrationmanagerpro', 'An error was encountered. Rolling back ...'),
+                    'nextAction' => 'migrationmanagerpro/run/rollback',
                     'data' => $data,
                 ));
             }
         } else {
             return $this->asJson(array(
                 'alive' => true,
-                'nextStatus' => Craft::t('migrationmanager', 'Running migrations ...'),
-                'nextAction' => 'migrationmanager/run/migrations',
+                'nextStatus' => Craft::t('migrationmanagerpro', 'Running migrations ...'),
+                'nextAction' => 'migrationmanagerpro/run/migrations',
                 'data' => $data,
             ));
         }
@@ -98,7 +99,6 @@ class RunController extends Controller
 
         $migrations = $data['migrations'];
 
-
         if (!is_array($migrations)){
             $migrations = [];
         }
@@ -106,18 +106,22 @@ class RunController extends Controller
         // give a little on screen pause
         sleep(2);
 
-        if (MigrationManager::getInstance()->migrations->runMigrations($migrations)) {
+        $migrationSvc = MigrationManagerPro::getInstance()->migrations;
+
+        if ($migrationSvc->runMigrations($migrations)) {
             return $this->asJson(array(
                 'alive' => true,
                 'finished' => true,
-                'returnUrl' => 'migrationmanager/migrations',
+                'returnUrl' => 'migrationmanagerpro/migrations',
             ));
         } else {
+            
             return $this->asJson(array(
                 'alive' => true,
                 'errorDetails' => 'Check the logs for details. ',
-                'nextStatus' => Craft::t('migrationmanager', 'An error was encountered. Rolling back ...'),
-                'nextAction' => 'migrationmanager/run/rollback',
+                'errors' => $migrationSvc->getErrors('error'),//['error'],
+                'nextStatus' => Craft::t('migrationmanagerpro', 'An error was encountered. Rolling back ...'),
+                'nextAction' => 'migrationmanagerpro/run/rollback',
                 'data' => $data,
             ));
         }

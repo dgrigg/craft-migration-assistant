@@ -1,11 +1,11 @@
 <?php
 
-namespace dgrigg\migrationmanager\controllers;
+namespace dgrigg\migrationmanagerpro\controllers;
 
 use Craft;
 use craft\web\Controller;
 use craft\elements\GlobalSet;
-use dgrigg\migrationmanager\MigrationManager;
+use dgrigg\migrationmanagerpro\MigrationManagerPro;
 use craft\web\assets\updates\UpdatesAsset;
 
 
@@ -25,11 +25,11 @@ class MigrationsController extends Controller
         $request = Craft::$app->getRequest();
         $post = $request->post();
 
-        if (MigrationManager::getInstance()->migrations->createSettingMigration($post)) {
-            Craft::$app->getSession()->setNotice(Craft::t('migrationmanager', 'Migration created.'));
+        if (MigrationManagerPro::getInstance()->migrations->createSettingMigration($post)) {
+            Craft::$app->getSession()->setNotice(Craft::t('migrationmanagerpro', 'Migration created.'));
 
         } else {
-            Craft::$app->getSession()->setError(Craft::t('migrationmanager', 'Could not create migration, check log tab for errors.'));
+            Craft::$app->getSession()->setError(Craft::t('migrationmanagerpro', 'Could not create migration, check log tab for errors.'));
         }
 
         return $this->redirectToPostedUrl();
@@ -47,10 +47,10 @@ class MigrationsController extends Controller
         $post = $request->post();
         $params['global'] = array($post['setId']);
 
-        if (MigrationManager::getInstance()->migrations->createContentMigration($params)) {
-            Craft::$app->getSession()->setNotice(Craft::t('migrationmanager','Migration created.'));
+        if (MigrationManagerPro::getInstance()->migrations->createContentMigration($params)) {
+            Craft::$app->getSession()->setNotice(Craft::t('migrationmanagerpro','Migration created.'));
         } else {
-            Craft::$app->getSession()->setError(Craft::t('migrationmanager','Could not create migration, check log tab for errors.'));
+            Craft::$app->getSession()->setError(Craft::t('migrationmanagerpro','Could not create migration, check log tab for errors.'));
         }
 
         return $this->redirectToPostedUrl();
@@ -68,10 +68,10 @@ class MigrationsController extends Controller
                 'migrations' =>  $request->getParam('migration', ''),
                 'applied' =>  $request->getParam('applied', 0),
              ),
-            'nextAction' => 'migrationmanager/run/start'
+            'nextAction' => 'migrationmanagerpro/run/start'
         );
 
-        return $this->renderTemplate('migrationmanager/actions/run', $data);
+        return $this->renderTemplate('migrationmanagerpro/actions/run', $data);
     }
 
     public function actionRerun(){
@@ -80,7 +80,7 @@ class MigrationsController extends Controller
         $request = Craft::$app->getRequest();
 
         if ($request->getParam('migration') == false){
-            Craft::$app->getSession()->setError(Craft::t('migrationmanager', 'You must select a migration to re run'));
+            Craft::$app->getSession()->setError(Craft::t('migrationmanagerpro', 'You must select a migration to re run'));
             return $this->redirectToPostedUrl();
         } else {
             $data = array(
@@ -88,9 +88,9 @@ class MigrationsController extends Controller
                     'migrations' => $request->getParam('migration', ''),
                     'applied' => $request->getParam('applied', 0),
                 ),
-                'nextAction' => $request->getParam('nextAction', 'migrationmanager/run/start')
+                'nextAction' => $request->getParam('nextAction', 'migrationmanagerpro/run/start')
             );
-            return $this->renderTemplate('migrationmanager/actions/run', $data);
+            return $this->renderTemplate('migrationmanagerpro/actions/run', $data);
         }
     }
 }
