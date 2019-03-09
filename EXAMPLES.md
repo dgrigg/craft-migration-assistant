@@ -2,7 +2,7 @@
 
 ## Migration file
 
-To create an empty migration file click the 'Create Migration' button on the Migration Manager Pro/Create Migrations tab. A new empty migration will be added to the `{root}/migrations` folder.
+To create an empty migration file click the 'Create Migration' button on the Migration Assistant/Create Migrations tab. A new empty migration will be added to the `{root}/migrations` folder.
 
 ```php
 namespace Craft;
