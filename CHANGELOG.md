@@ -1,4 +1,4 @@
-# Migration Manager Changelog
+# Migration Assistant Changelog
 
 ## 3.1.0 - 2019-03-08
 
