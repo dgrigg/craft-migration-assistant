@@ -1,5 +1,10 @@
 # Migration Assistant Changelog
 
+## 3.1.1 - 2019-05-09
+
+### Fixed
+- fixed issue for PostgresSQL creating fields
+
 ## 3.1.0 - 2019-03-08
 
 ### News
