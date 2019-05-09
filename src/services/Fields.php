@@ -75,7 +75,7 @@ class Fields extends BaseMigration
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         } else {
-            $data['id'] = false;
+            $data['id'] = 0;
         }
 
         $field = $this->createModel($data);
