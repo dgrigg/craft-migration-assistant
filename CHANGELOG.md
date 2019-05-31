@@ -1,5 +1,12 @@
 # Migration Assistant Changelog
 
+## 3.1.2 - 2019-05-31
+
+### Fixed
+- export UID on entry content exports to prevent null error during import
+- fixed invalid postDate error for content entry imports
+- fixed user group export issue with uid
+
 ## 3.1.1 - 2019-05-09
 
 ### Fixed
