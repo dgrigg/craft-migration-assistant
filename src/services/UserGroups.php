@@ -53,12 +53,17 @@ class UserGroups extends BaseMigration
                     }
                 }
             }
-            
+
             $newGroup['permissions'] = $this->getGroupPermissionHandles($id);
             $newGroup['settings'] = Craft::$app->systemSettings->getSettings('users');
 
             if ($newGroup['settings']['defaultGroup'] != null) {
-                $group = Craft::$app->userGroups->getGroupById($newGroup['settings']['defaultGroup']);
+                if (MigrationManagerHelper::isVersion('3.1')) {
+                    $group = Craft::$app->userGroups->getGroupByUid($newGroup['settings']['defaultGroup']);
+                } else {
+                    $group = Craft::$app->userGroups->getGroupById($newGroup['settings']['defaultGroup']);
+                }
+
                 $newGroup['settings']['defaultGroup'] = $group->handle;
             }
         }

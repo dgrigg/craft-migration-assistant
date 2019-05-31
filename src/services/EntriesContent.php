@@ -4,6 +4,7 @@ namespace dgrigg\migrationassistant\services;
 use Craft;
 use craft\elements\Entry;
 use craft\helpers\DateTimeHelper;
+use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
 
 class EntriesContent extends BaseContentMigration
 {
@@ -47,7 +48,8 @@ class EntriesContent extends BaseContentMigration
                         'postDate' => $entry->postDate,
                         'expiryDate' => $entry->expiryDate,
                         'title' => $entry->title,
-                        'entryType' => $entry->type->handle
+                        'entryType' => $entry->type->handle,
+                        'uid' => $entry->uid
                     );
 
                     if ($entry->getParent()) {
@@ -86,7 +88,7 @@ class EntriesContent extends BaseContentMigration
                 $value['id'] = $primaryEntry->id;
                 $this->localizeData($primaryEntry, $value);
             }
-            
+
             $entry = $this->createModel($value);
             $this->getSourceIds($value);
             $fields = array_key_exists('fields', $value) ? $value['fields'] : [];
@@ -94,7 +96,7 @@ class EntriesContent extends BaseContentMigration
             $entry->setFieldValues($fields);
             $value['fields'] = $fields;
             $event = $this->onBeforeImport($entry, $value);
-            
+
             if ($event->isValid) {
                 $result = Craft::$app->getElements()->saveElement($event->element);
                 if ($result) {
@@ -144,6 +146,9 @@ class EntriesContent extends BaseContentMigration
         $entry->expiryDate = is_null($data['expiryDate']) ? '' : DateTimeHelper::toDateTime($data['expiryDate']['date']);
         $entry->enabled = $data['enabled'];
         $entry->siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
+        if (MigrationManagerHelper::isVersion('3.1') && array_key_exists('uid', $data)) {
+            $entry->uid = $data['uid'];
+        }
 
         if (array_key_exists('parent', $data))
         {

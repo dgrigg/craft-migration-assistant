@@ -130,7 +130,7 @@ class Fields extends BaseMigration
         if (MigrationManagerHelper::isVersion('3.1')){
             $fieldData['searchable'] = empty($data['searchable']) ? true : $data['searchable'];
         }
-        
+
         $field = $fieldsService->createField($fieldData);
 
         return $field;
@@ -270,7 +270,7 @@ class Fields extends BaseMigration
      */
     private function getNeoField(&$newField, $fieldId, $includeID = false)
     {
-       
+
         $neo = Craft::$app->plugins->getPlugin('neo');
         $groups = $neo->blockTypes->getGroupsByFieldId($fieldId);
         if (count($groups)){
@@ -286,7 +286,7 @@ class Fields extends BaseMigration
         }
 
         $blockTypes = $neo->blockTypes->getByFieldId($fieldId);
-       
+
         $blockCount = 1;
         foreach ($blockTypes as $blockType)
         {
@@ -373,12 +373,12 @@ class Fields extends BaseMigration
                         if ($source) {
                             $field['typesettings']['sources'][$key] = $source->handle;
                         }
-                    } 
+                    }
                 }
             } else {
                 $field['typesettings']['sources'] = array();
             }
-           
+
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
                 $value = $field['typesettings']['defaultUploadLocationSource'];
                 if (substr($value, 0, 7) == 'folder:') {
@@ -443,7 +443,7 @@ class Fields extends BaseMigration
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
                 $value = $field['typesettings']['singleUploadLocationSource'];
                 $source = Craft::$app->volumes->getVolumeById(intval($value));
-                
+
                 if ($source) {
                     $field['typesettings']['singleUploadLocationSource'] = $source->handle;
                 }
@@ -462,7 +462,7 @@ class Fields extends BaseMigration
                     } else {
                         $field['typesettings']['source'] = [];
                     }
-                   
+
                 }
             }
         }
@@ -556,7 +556,7 @@ class Fields extends BaseMigration
         {
 
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
-                
+
                 foreach ($blockType['fields'] as &$childField) {
                     $this->getSettingIds($childField);
                 }
@@ -711,7 +711,7 @@ class Fields extends BaseMigration
                     $this->addError('error', 'Section : ' . $source . ' is not defined in system');
                 }
             }
-            
+
             $field['typesettings']['sources'] = $newSources;
         }
 
@@ -811,7 +811,7 @@ class Fields extends BaseMigration
         $newFields = [];
         $context = 'superTableBlockType:' . (MigrationManagerHelper::isVersion('3.1') ? $existingBlockType->uid : $existingBlockType->id );
         $existingFields = Craft::$app->fields->getAllFields($context);
-        
+
         foreach($newBlockType['fields'] as $key => &$tableField)
         {
             $existingField = $this->getSuperTableFieldByHandle($tableField['handle'], $existingFields);
@@ -856,7 +856,7 @@ class Fields extends BaseMigration
             $blockTypes = $newField['typesettings']['blockTypes'];
             $newBlocks = [];
             foreach ($blockTypes as $key => &$block) {
-              
+
                 $existingBlock = $this->getMatrixBlockByHandle($block['handle'], $field->id);
                 if ($existingBlock) {
                     $this->mergeMatrixBlock($block, $existingBlock);
@@ -878,7 +878,7 @@ class Fields extends BaseMigration
     private function mergeMatrixBlock(&$newBlock, $block)
     {
         $newBlock['fieldLayoutId'] = $block->fieldLayoutId;
-        $newBlock['sortOrder'] = $block->sortOrder;       
+        $newBlock['sortOrder'] = $block->sortOrder;
         $fields = $newBlock['fields'];
         $newFields = [];
 
@@ -959,10 +959,10 @@ class Fields extends BaseMigration
     }
 
     private function getNeoBlockByHandle($handle, $id){
-   
+
         $plugin = Craft::$app->plugins->getPlugin('neo');
         $blocks = $plugin->blockTypes->getByFieldId($id);
-       
+
         foreach($blocks as $block)
         {
             if ($block->handle == $handle){
