@@ -1,5 +1,11 @@
 # Migration Assistant Changelog
 
+## 3.1.3 - 2019-07-23
+
+### Fixed
+- entry imports now recognize timezone value for post and expiry dates
+- fixed bug with duplicate entries being created during import for non live entries
+
 ## 3.1.2 - 2019-05-31
 
 ### Fixed

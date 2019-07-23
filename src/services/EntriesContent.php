@@ -5,6 +5,9 @@ use Craft;
 use craft\elements\Entry;
 use craft\helpers\DateTimeHelper;
 use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
+use DateTime;
+use DateTimeZone;
+use Log;
 
 class EntriesContent extends BaseContentMigration
 {
@@ -76,6 +79,7 @@ class EntriesContent extends BaseContentMigration
             ->section($data['section'])
             ->slug($data['slug'])
             ->site(Craft::$app->sites->getPrimarySite()->handle)
+            ->status(null)
             ->one();
 
         if (array_key_exists('parent', $data))
@@ -142,8 +146,9 @@ class EntriesContent extends BaseContentMigration
         }
 
         $entry->slug = $data['slug'];
-        $entry->postDate = is_null($data['postDate']) ? '' : DateTimeHelper::toDateTime($data['postDate']['date']);
-        $entry->expiryDate = is_null($data['expiryDate']) ? '' : DateTimeHelper::toDateTime($data['expiryDate']['date']);
+        $entry->postDate = is_null($data['postDate']) ? '' : new DateTime($data['postDate']['date'], new DateTimeZone($data['postDate']['timezone']));
+        $entry->expiryDate = is_null($data['expiryDate']) ? '' : new DateTime($data['expiryDate']['date'], new DateTimeZone($data['expiryDate']['timezone']));
+
         $entry->enabled = $data['enabled'];
         $entry->siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
         if (MigrationManagerHelper::isVersion('3.1') && array_key_exists('uid', $data)) {
