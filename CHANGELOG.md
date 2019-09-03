@@ -1,5 +1,15 @@
 # Migration Assistant Changelog
 
+## 3.1.4 - 2019-09-03
+
+### Added
+- entry exports now include the author field value
+- added support for the Link Field plugin field type https://github.com/sebastian-lenz/craft-linkfield
+
+### Fixed
+- fixed issue with empty values in Entry fields contained within Matrix blocks that are translatable
+- fixed entry source handle for single entry sections
+
 ## 3.1.3 - 2019-07-23
 
 ### Fixed
