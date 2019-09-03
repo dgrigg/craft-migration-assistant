@@ -467,21 +467,22 @@ class Fields extends BaseMigration
             }
         }
 
-        if ($field['type'] == 'craft\fields\Entries') {
+		if ($field['type'] == 'craft\fields\Entries') {
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
-                    if (substr($value, 0, 8) == 'section:') {
-                        $value = substr($value, 8);
-                        $section = MigrationManagerHelper::isVersion('3.1') ? Craft::$app->sections->getSectionByUid($value) : Craft::$app->sections->getSectionById(intval($value));
+                    if ( (substr($value, 0, 8) == 'section:') || (substr($value, 0, 7) == 'single:') ) {
+						$sourceDetails = explode(':',$value);
+
+                        $section = MigrationManagerHelper::isVersion('3.1') ? Craft::$app->sections->getSectionByUid($sourceDetails[1]) : Craft::$app->sections->getSectionById(intval($sourceDetails[1]));
                         if ($section) {
                             $field['typesettings']['sources'][$key] = $section->handle;
                         }
-                    }
+					}
                 }
             } else {
                 $field['typesettings']['sources'] = [];
             }
-        }
+		}
 
         if ($field['type'] == 'craft\fields\Tags') {
             if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
@@ -702,7 +703,9 @@ class Fields extends BaseMigration
                 $newSource = Craft::$app->sections->getSectionByHandle($source);
                 if ($newSource)
                 {
-                    $newSources[] = 'section:' . (MigrationManagerHelper::isVersion('3.1') ? $newSource->uid : $newSource->id);
+                    $type = $newSource->type == "single" ? "single" : "section";
+
+					$newSources[] = $type.':' . (MigrationManagerHelper::isVersion('3.1') ? $newSource->uid : $newSource->id);
                 }
                 elseif ($source == 'singles')
                 {
