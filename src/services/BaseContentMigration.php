@@ -33,7 +33,7 @@ abstract class BaseContentMigration extends BaseMigration
     {
         $field = $fieldModel;
         $value = $parent->getFieldValue($field->handle);
-        
+
         switch ($field->className()) {
              case 'craft\redactor\Field':
                 if ($value){
@@ -74,7 +74,7 @@ abstract class BaseContentMigration extends BaseMigration
                 });
                 break;
             case 'verbb\supertable\fields\SuperTableField':
-               
+
                 $model = $parent[$field->handle];
 
                 $value = $this->getIteratorValues($model, function ($item) {
@@ -93,6 +93,20 @@ abstract class BaseContentMigration extends BaseMigration
                 //need to make sure hex value goes a string
                 $value = (string)$value;
                 break;
+            case 'typedlinkfield\fields\LinkField':
+                $elementTypes = ['asset','category','entry','user'];
+                if (in_array($value->type, $elementTypes)){
+                    $elementType = 'craft\\elements\\' . ucfirst($value->type);
+                    $element = Craft::$app->elements->getElementById($value->value, $elementType);
+                    $value->value = [$this->getSourceHandle($element, $elementType)];
+                } elseif ($value->type == 'site'){
+                    $site = Craft::$app->sites->getSiteById($value->value);
+                    $value->value = $site->handle;
+                }
+                //convert the field object to an array so we can add a property
+                $value = json_decode(json_encode($value), true);
+                $value['elementType'] = 'typedlinkfield\\fields\\LinkField';
+                break;
             default:
                 if ($field instanceof BaseRelationField) {
                     $this->getSourceHandles($value);
@@ -101,13 +115,13 @@ abstract class BaseContentMigration extends BaseMigration
                 }
                 break;
         }
-        
+
         //export the field value
         $value = $this->onBeforeExportFieldValue($field, $value);
         $content[$field->handle] = $value;
     }
-    
-    
+
+
     /**
      * Fires an 'onBeforeImport' event.
      *
@@ -137,8 +151,8 @@ abstract class BaseContentMigration extends BaseMigration
            $this->onBeforeImportFieldValue(null, $value);
         }
     }
-    
-    
+
+
     protected function validateFieldValue($parent, $fieldHandle, &$fieldValue)
     {
         $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
@@ -182,7 +196,7 @@ abstract class BaseContentMigration extends BaseMigration
             }
         }
     }
-    
+
 
    /**
     * Fires an 'onBeforeImport' event.
@@ -277,59 +291,72 @@ abstract class BaseContentMigration extends BaseMigration
         $value = [];
         if ($elements) {
             foreach ($elements as $element) {
-                switch ($element->className()) {
-                    case 'craft\elements\Asset':
-                        $item = [
-                            'elementType' => $element->className(),
-                            'filename' => $element->filename,
-                            'folder' => $element->getFolder()->name,
-                            'source' => $element->getVolume()->handle
-                        ];
-                        break;
-                    case 'craft\elements\Category':
-                        $item = [
-                            'elementType' => $element->className(),
-                            'slug' => $element->slug,
-                            'category' => $element->getGroup()->handle
-                        ];
-                        break;
-                    case 'craft\elements\Entry':
-                        $item = [
-                            'elementType' => $element->className(),
-                            'slug' => $element->slug,
-                            'section' => $element->getSection()->handle
-                        ];
-                        break;
-                    case 'craft\elements\Tag':
-                        $tagValue = [];
-                        $this->getContent($tagValue, $element);
-                        $item = [
-                            'elementType' => $element->className(),
-                            'slug' => $element->slug,
-                            'group' => $element->getGroup()->handle,
-                            'value' => $tagValue
-                        ];
-                        break;
-                    case 'craft\elements\User':
-                        $item = [
-                            'elementType' => $element->className(),
-                            'username' => $element->username
-                        ];
-                        break;
-                    default:
-                        $item = null;
-                }
+                $item = $this->getSourceHandle($element, $element->className());
 
                 if ($item)
                 {
                     $value[] = $item;
                 }
-
-
             }
         }
 
         return $value;
+    }
+
+    /**
+     * @param $element
+     * @param $type
+     * @return array
+     */
+    protected function getSourceHandle($element, $type)
+    {
+        $item = false;
+
+        switch ($type) {
+            case 'craft\elements\Asset':
+                $item = [
+                    'elementType' => $element->className(),
+                    'filename' => $element->filename,
+                    'folder' => $element->getFolder()->name,
+                    'source' => $element->getVolume()->handle
+                ];
+                break;
+            case 'craft\elements\Category':
+                $item = [
+                    'elementType' => $element->className(),
+                    'slug' => $element->slug,
+                    'category' => $element->getGroup()->handle
+                ];
+                break;
+            case 'craft\elements\Entry':
+                $item = [
+                    'elementType' => $element->className(),
+                    'slug' => $element->slug,
+                    'section' => $element->getSection()->handle,
+                    'site' => $element->getSite()->handle
+                ];
+                break;
+            case 'craft\elements\Tag':
+                $tagValue = [];
+                $this->getContent($tagValue, $element);
+                $item = [
+                    'elementType' => $element->className(),
+                    'slug' => $element->slug,
+                    'group' => $element->getGroup()->handle,
+                    'value' => $tagValue
+                ];
+                break;
+            case 'craft\elements\User':
+                $item = [
+                    'elementType' => $element->className(),
+                    'username' => $element->username
+                ];
+                break;
+            default:
+                $item = null;
+        }
+
+        return $item;
     }
 
     /**
@@ -377,6 +404,7 @@ abstract class BaseContentMigration extends BaseMigration
             if (is_array($element) && key_exists('elementType', $element)) {
                 $elementType = str_replace('/', '\\', $element['elementType']);
                 $func = null;
+
                 switch ($elementType) {
                     case 'craft\elements\Asset':
                          $func = 'dgrigg\migrationassistant\helpers\MigrationManagerHelper::getAssetByHandle';
@@ -392,6 +420,10 @@ abstract class BaseContentMigration extends BaseMigration
                         break;
                     case 'craft\elements\User':
                         $func = 'dgrigg\migrationassistant\helpers\MigrationManagerHelper::getUserByHandle';
+                        break;
+                    case 'typedlinkfield\fields\LinkField':
+                        $element = $this->populateLinkField($element);
+                        $isElementField = false;
                         break;
                     default:
                         break;
@@ -416,6 +448,34 @@ abstract class BaseContentMigration extends BaseMigration
 
         return true;
     }
+
+    /**
+     * Get element linked in Link field
+     * @param
+     * @return
+     */
+     /**
+     * @param $fieldValue
+     * @param $field
+     */
+
+   public function populateLinkField($element)
+   {
+       $elementTypes = ['asset','category','entry','user'];
+        if (in_array($element['type'], $elementTypes)){
+            $value = $element['value'];
+            $this->populateIds($value);
+            if (count($value) > 0){
+                $element['value'] = $value[0];
+            }
+        } elseif ($element['type'] == 'site'){
+            $site = Craft::$app->sites->getSiteByHandle($element['value']);
+            if ($site){
+                $element['value'] = $site->id;
+            }
+        }
+        return $element;
+   }
 
     /**
      * Look for matrix/supertables/neo that are not localized and update the keys to

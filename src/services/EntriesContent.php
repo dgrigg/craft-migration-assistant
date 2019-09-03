@@ -55,6 +55,10 @@ class EntriesContent extends BaseContentMigration
                         'uid' => $entry->uid
                     );
 
+                    if ($entry->author) {
+                        $entryContent['author'] = $entry->author->username;
+                    }
+
                     if ($entry->getParent()) {
                         $entryContent['parent'] = $primaryEntry->getParent()->slug;
                     }
@@ -98,6 +102,7 @@ class EntriesContent extends BaseContentMigration
             $fields = array_key_exists('fields', $value) ? $value['fields'] : [];
             $this->validateImportValues($fields);
             $entry->setFieldValues($fields);
+
             $value['fields'] = $fields;
             $event = $this->onBeforeImport($entry, $value);
 
@@ -153,6 +158,13 @@ class EntriesContent extends BaseContentMigration
         $entry->siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
         if (MigrationManagerHelper::isVersion('3.1') && array_key_exists('uid', $data)) {
             $entry->uid = $data['uid'];
+        }
+
+        if (array_key_exists('author', $data)){
+            $author = Craft::$app->users->getUserByUsernameOrEmail($data['author']);
+            if ($author){
+                $entry->authorId = $author->id;
+            }
         }
 
         if (array_key_exists('parent', $data))

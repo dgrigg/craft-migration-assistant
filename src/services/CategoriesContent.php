@@ -42,7 +42,8 @@ class CategoriesContent extends BaseContentMigration
                 'enabled' => $category->enabled,
                 'site' => $site->handle,
                 'enabledForSite' => $category->enabledForSite,
-                'title' => $category->title
+                'title' => $category->title,
+                'uid' => $category->uid
             );
 
             if ($category->getParent())
@@ -90,7 +91,7 @@ class CategoriesContent extends BaseContentMigration
             if (key_exists('fields', $value)) {
                $category->setFieldValues($value['fields']);
             }
-            
+
             $event = $this->onBeforeImport($category, $value);
             if ($event->isValid) {
 
@@ -135,6 +136,9 @@ class CategoriesContent extends BaseContentMigration
         $category->slug = $data['slug'];
         $category->enabled = $data['enabled'];
         $category->title = $data['title'];
+        if (array_key_exists('uid', $data)){
+            $category->uid = $data['uid'];
+        }
 
         if (array_key_exists('parent', $data))
         {
