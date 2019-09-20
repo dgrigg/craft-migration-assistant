@@ -1,5 +1,10 @@
 # Migration Assistant Changelog
 
+## 3.1.5 - 2019-09-20
+
+### Fixed
+- structure entries with an unpublished parent entry where not being associated to the parent entry
+
 ## 3.1.4 - 2019-09-03
 
 ### Added

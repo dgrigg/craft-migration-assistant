@@ -173,6 +173,7 @@ class EntriesContent extends BaseContentMigration
             $query->sectionId($entry->sectionId);
             $query->siteId($entry->siteId);
             $query->slug($data['parent']);
+            $query->status(null);
             $parent = $query->one();
             if ($parent) {
                 $entry->newParentId = $parent->id;
