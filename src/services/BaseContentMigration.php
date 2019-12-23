@@ -48,12 +48,13 @@ abstract class BaseContentMigration extends BaseMigration
                 $model->limit = null;
                 $value = $this->getIteratorValues($model, function ($item) {
                     $itemType = $item->getType();
+
                     $value = [
                         'type' => $itemType->handle,
                         'enabled' => $item->enabled,
+                        'sortOrder' => $item->sortOrder,
                         'fields' => []
                     ];
-
                     return $value;
                 });
                 break;
@@ -74,9 +75,7 @@ abstract class BaseContentMigration extends BaseMigration
                 });
                 break;
             case 'verbb\supertable\fields\SuperTableField':
-
                 $model = $parent[$field->handle];
-
                 $value = $this->getIteratorValues($model, function ($item) {
                     $value = [
                         'type' => $item->typeId,

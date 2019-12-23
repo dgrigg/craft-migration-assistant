@@ -43,6 +43,7 @@ class Migrations extends Component
         'category' => 'categoriesContent',
         'user' => 'usersContent',
         'global' => 'globalsContent',
+        'asset' => 'assetsContent',
     );
 
 
@@ -251,7 +252,7 @@ class Migrations extends Component
             foreach ($this->_settingsDependencyTypes as $key => $value) {
                 $service = $plugin->get($value);
                 if (array_key_exists($service->getDestination(), $data['settings']['dependencies'])) {
-                   
+
                     $service->import($data['settings']['dependencies'][$service->getDestination()]);
                     if ($service->hasErrors()) {
                         $errors = $service->getErrors();

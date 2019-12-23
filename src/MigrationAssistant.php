@@ -5,6 +5,7 @@ namespace dgrigg\migrationassistant;
 use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
+use craft\elements\Asset;
 use craft\elements\Entry;
 use craft\elements\Category;
 use craft\elements\User;
@@ -22,6 +23,7 @@ use dgrigg\migrationassistant\assetbundles\cpglobals\CpGlobalsAssetBundle;
 use dgrigg\migrationassistant\actions\MigrateCategoryElementAction;
 use dgrigg\migrationassistant\actions\MigrateEntryElementAction;
 use dgrigg\migrationassistant\actions\MigrateUserElementAction;
+use dgrigg\migrationassistant\actions\MigrateAssetElementAction;
 use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
 use dgrigg\migrationassistant\variables\MigrationManagerVariable;
 
@@ -92,6 +94,7 @@ class MigrationAssistant extends Plugin
             'entriesContent' => \dgrigg\migrationassistant\services\EntriesContent::class,
             'globalsContent' => \dgrigg\migrationassistant\services\GlobalsContent::class,
             'usersContent' => \dgrigg\migrationassistant\services\UsersContent::class,
+            'assetsContent' => \dgrigg\migrationassistant\services\AssetsContent::class,
         ]);
 
         // Register our CP routes
@@ -115,7 +118,7 @@ class MigrationAssistant extends Plugin
                $variable->set('migrationassistant', MigrationManagerVariable::class);
             }
          );
-   
+
         // Register actions only if Solo license or user has rights
         if (Craft::$app->getEdition() > Craft::Solo && (Craft::$app->user->checkPermission('createContentMigrations') == true || Craft::$app->getUser()->getIsAdmin())
            || Craft::$app->getEdition() === Craft::Solo) {
@@ -125,20 +128,26 @@ class MigrationAssistant extends Plugin
                  $event->actions[] = MigrateEntryElementAction::class;
               }
            );
-   
+
            Event::on(Category::class, Element::EVENT_REGISTER_ACTIONS,
               function (RegisterElementActionsEvent $event) {
                  $event->actions[] = MigrateCategoryElementAction::class;
               }
            );
-   
+
            Event::on(User::class, Element::EVENT_REGISTER_ACTIONS,
               function (RegisterElementActionsEvent $event) {
                  $event->actions[] = MigrateUserElementAction::class;
               }
            );
+
+           Event::on(Asset::class, Element::EVENT_REGISTER_ACTIONS,
+              function (RegisterElementActionsEvent $event) {
+                 $event->actions[] = MigrateAssetElementAction::class;
+              }
+           );
         }
-   
+
        Event::on(
           UserPermissions::class,
           UserPermissions::EVENT_REGISTER_PERMISSIONS,
