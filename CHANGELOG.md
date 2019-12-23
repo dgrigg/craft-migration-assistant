@@ -1,5 +1,10 @@
 # Migration Assistant Changelog
 
+## 3.1.6 - 2019-12-23
+
+### Fixed
+- matrix content migrations sort order, block order now imports in correct sequence
+
 ## 3.1.5 - 2019-09-20
 
 ### Fixed

@@ -51,6 +51,7 @@ abstract class BaseContentMigration extends BaseMigration
                     $value = [
                         'type' => $itemType->handle,
                         'enabled' => $item->enabled,
+                        'sortOrder' => $item->sortOrder,
                         'fields' => []
                     ];
 
