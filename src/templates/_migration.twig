@@ -12,36 +12,34 @@ class {{ className }} extends Migration
 {% if empty == false %}
     /**
     Migration manifest:
-    {% for key, value in manifest %}
+{% for key, value in manifest %}
 
     {{ key|upper }}
-    {% for item in value %}
+{% for item in value %}
     - {{ item }}
-    {% endfor %}
-    {% endfor %}
+{% endfor %}
+{% endfor %}
     */
 
-private $json = <<<'JSON'
+    private $json = <<<'JSON'
 {{ migration|raw }}
 JSON;
 {% endif %}
 
-	/**
-	 * Any migration code in here is wrapped inside of a transaction.
-	 * Returning false will rollback the migration
-	 *
-	 * @return bool
-	 */
-	public function safeUp()
-	{
-	    {% spaceless %}
-	    {% if empty %}
+    /**
+     * Any migration code in here is wrapped inside of a transaction.
+     * Returning false will rollback the migration
+     *
+     * @return bool
+     */
+    public function safeUp()
+    {
+{% if empty %}
         //add your custom migration code, see the EXAMPLES.md for examples
         return true;
-        {% else %}
+{% else %}
         return MigrationAssistant::getInstance()->migrations->import($this->json);
-        {% endif %}
-        {% endspaceless %}
+{% endif %}
     }
 
     public function safeDown()
