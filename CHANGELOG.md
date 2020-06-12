@@ -1,5 +1,12 @@
 # Migration Assistant Changelog
 
+## 3.1.7 - 2020-06-12
+
+### Fixed
+- section `Propagation Method` added to export data
+- fixed bug with entry being duplicated when `Progogration Method` is set to 'Only save entries to the site they were created in' on content migrations
+- assets in deep folders are now located correctly during content migrations
+
 ## 3.1.6 - 2019-12-23
 
 ### Fixed

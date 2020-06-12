@@ -319,7 +319,8 @@ abstract class BaseContentMigration extends BaseMigration
                     'elementType' => $element->className(),
                     'filename' => $element->filename,
                     'folder' => $element->getFolder()->name,
-                    'source' => $element->getVolume()->handle
+                    'source' => $element->getVolume()->handle,
+                    'path' => $element->getFolder()->path,
                 ];
                 break;
             case 'craft\elements\Category':

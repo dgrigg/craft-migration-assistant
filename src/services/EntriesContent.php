@@ -80,21 +80,32 @@ class EntriesContent extends BaseContentMigration
     public function importItem(Array $data)
     {
         $primaryEntry = Entry::find()
-            ->section($data['section'])
-            ->slug($data['slug'])
-            ->site(Craft::$app->sites->getPrimarySite()->handle)
-            ->status(null)
-            ->one();
+          ->section($data['section'])
+          ->slug($data['slug'])
+          ->site(Craft::$app->sites->getPrimarySite()->handle)
+          ->status(null)
+          ->one();
 
         if (array_key_exists('parent', $data))
         {
             $this->importItem($data['parent']);
         }
 
-        foreach($data['sites'] as $value) {
+        foreach($data['sites'] as $key => $value) {
             if ($primaryEntry) {
-                $value['id'] = $primaryEntry->id;
-                $this->localizeData($primaryEntry, $value);
+              $value['id'] = $primaryEntry->id;
+              $this->localizeData($primaryEntry, $value);
+            } else {
+              $siteEntry = Entry::find()
+                ->section($data['section'])
+                ->slug($data['slug'])
+                ->site($key)
+                ->status(null)
+                ->one();
+
+              if ($siteEntry){
+                $value['id'] = $siteEntry->id;
+              }
             }
 
             $entry = $this->createModel($value);
@@ -155,6 +166,8 @@ class EntriesContent extends BaseContentMigration
         $entry->expiryDate = is_null($data['expiryDate']) ? '' : new DateTime($data['expiryDate']['date'], new DateTimeZone($data['expiryDate']['timezone']));
 
         $entry->enabled = $data['enabled'];
+        $entry->enabledForSite = $data['enabledForSite'];
+
         $entry->siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
         if (MigrationManagerHelper::isVersion('3.1') && array_key_exists('uid', $data)) {
             $entry->uid = $data['uid'];

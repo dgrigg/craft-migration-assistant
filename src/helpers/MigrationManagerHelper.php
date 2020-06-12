@@ -80,11 +80,16 @@ class MigrationManagerHelper
      */
     public static function getAssetByHandle($element)
     {
+
         $volume = Craft::$app->volumes->getVolumeByHandle($element['source']);
         if ($volume) {
-
             $folderCriteria = new FolderCriteria();
-            $folderCriteria->name = $element['folder'];
+            if (array_key_exists('path', $element)) {
+              $folderCriteria->path = $element['path'];
+            } else {
+              $folderCriteria->name = $element['folder'];
+            }
+
             $folderCriteria->volumeId = $volume->id;
 
             $folder = Craft::$app->assets->findFolder($folderCriteria);

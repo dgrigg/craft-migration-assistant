@@ -35,12 +35,19 @@ class Sections extends BaseMigration
         }
 
         $newSection = [
-            'name' => $section->attributes['name'],
-            'handle' => $section->attributes['handle'],
-            'type' => $section->attributes['type'],
-            'enableVersioning' => $section->attributes['enableVersioning'],
-            'propagateEntries' => $section->attributes['propagateEntries'],
+          'name' => $section->attributes['name'],
+          'handle' => $section->attributes['handle'],
+          'type' => $section->attributes['type'],
+          'enableVersioning' => $section->attributes['enableVersioning']
         ];
+
+        if (array_key_exists('propogateEntries', $section->attributes)) {
+          $newSection['propogateEntries'] = $section->attributes['propagateEntries'];
+        }
+
+        if (array_key_exists('propagationMethod', $section->attributes)) {
+          $newSection['propagationMethod'] = $section->attributes['propagationMethod'];
+        }
 
         if ($section->type == Section::TYPE_STRUCTURE){
             $newSection['maxLevels'] =  $section->attributes['maxLevels'];
@@ -126,8 +133,8 @@ class Sections extends BaseMigration
             if ($event->isValid) {
                 if (Craft::$app->sections->saveSection($event->element)) {
                     $this->onAfterImport($event->element, $data);
-                   
-                    //only need for sections pre project config 
+
+                    //only need for sections pre project config
                     if (!MigrationManagerHelper::isVersion('3.1') && !$existing) {
                         //wipe out the default entry type
                         $defaultEntryType = Craft::$app->sections->getEntryTypesBySectionId($section->id);
@@ -180,7 +187,14 @@ class Sections extends BaseMigration
         $section->handle = $data['handle'];
         $section->type = $data['type'];
         $section->enableVersioning = $data['enableVersioning'];
-        $section->propagateEntries = $data['propagateEntries'];
+
+        if (array_key_exists('propagateEntries', $data)) {
+          $section->propagateEntries = $data['propagateEntries'];
+        }
+
+        if (array_key_exists('propagationMethod', $data)) {
+          $section->propagationMethod = $data['propagationMethod'];
+        }
 
         if ($section->type == Section::TYPE_STRUCTURE){
             $section->maxLevels = $data['maxLevels'];
