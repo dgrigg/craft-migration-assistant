@@ -57,7 +57,7 @@ class Sites extends BaseMigration
         if ($existing){
             $this->mergeUpdates($data, $existing);
         }
-        
+
         $site = $this->createModel($data);
         $event = $this->onBeforeImport($site, $data);
 
@@ -86,13 +86,14 @@ class Sites extends BaseMigration
         if (array_key_exists('id', $data)) {
             $site->id = $data['id'];
         }
-       
+
         $group = $this->getSiteGroup($data['group']);
         if (!$group){
            $group = new SiteGroup();
            $group->name = $data['group'];
+           Craft::$app->sites->saveGroup($group, true);
         }
-   
+
         $data['groupId'] = $group->id;
         $site->name = $data['name'];
         $site->handle = $data['handle'];
@@ -114,7 +115,7 @@ class Sites extends BaseMigration
         $newSite['id'] = $site->id;
     }
 
-  
+
    /**
     * This function is used vs Craft::$app->sites->getAllGroups() to ensure the id can
     * be returned for newly created groups without a db commit transaction being required
@@ -128,16 +129,16 @@ class Sites extends BaseMigration
          ->from(['{{%sitegroups}}'])
          ->orderBy(['name' => SORT_DESC])
          ->where(['name' => $name]);
-      
+
       $result = $query->one();
-      
+
       if ($result){
          $group = new SiteGroup();
          $group->id = $result['id'];
          $group->name = $result['name'];
          return $group;
-         
-         
+
+
       } else {
          return false;
       }

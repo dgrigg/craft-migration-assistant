@@ -1,11 +1,18 @@
 # Migration Assistant Changelog
 
+## 3.1.8 - 2020-06-13
+
+### Fixed
+- fixed issue introduced with Craft 3.2.0 with order of items in Matrix/Neo/SuperTables
+- fixed entry enabled/disabled setting on content migrations for site/locale entries
+
 ## 3.1.7 - 2020-06-12
 
 ### Fixed
 - section `Propagation Method` added to export data
 - fixed bug with entry being duplicated when `Progogration Method` is set to 'Only save entries to the site they were created in' on content migrations
 - assets in deep folders are now located correctly during content migrations
+- fixed whitespace in generated migration file
 
 ## 3.1.6 - 2019-12-23
 
