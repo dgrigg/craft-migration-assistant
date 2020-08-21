@@ -1,5 +1,14 @@
 # Migration Assistant Changelog
 
+## 3.1.9 - 2020-08-20
+
+### Added
+- support for new Entry Type layouts and elements in Craft 3.5
+
+### Fixed
+- fixed issue with null path when migration assets
+- fixed 'titleLabel' bug when creating migrations in Craft 3.5
+
 ## 3.1.8 - 2020-06-13
 
 ### Fixed

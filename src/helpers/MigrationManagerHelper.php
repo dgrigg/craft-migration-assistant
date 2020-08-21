@@ -84,7 +84,8 @@ class MigrationManagerHelper
         $volume = Craft::$app->volumes->getVolumeByHandle($element['source']);
         if ($volume) {
             $folderCriteria = new FolderCriteria();
-            if (array_key_exists('path', $element)) {
+
+            if (array_key_exists('path', $element) && !empty($element['path'])) {
               $folderCriteria->path = $element['path'];
             } else {
               $folderCriteria->name = $element['folder'];

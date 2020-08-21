@@ -34,7 +34,6 @@ class Categories extends BaseMigration
             'maxLevels' => $category->maxLevels
         ];
 
-
         $siteSettings = $category->getSiteSettings();
         $newCategory['sites'] = array();
         foreach ($siteSettings as $siteSetting) {
@@ -47,26 +46,8 @@ class Categories extends BaseMigration
             ];
         }
 
-        if ($fullExport)
-        {
-            $fieldLayout = $category->getFieldLayout();
-
-            if ($fieldLayout) {
-
-                $newCategory['fieldLayout'] = array();
-                $newCategory['requiredFields'] = array();
-
-                foreach ($fieldLayout->getTabs() as $tab) {
-                    $newCategory['fieldLayout'][$tab->name] = array();
-                    foreach ($tab->getFields() as $tabField) {
-
-                        $newCategory['fieldLayout'][$tab->name][] = $tabField->handle;
-                        if ($tabField->required) {
-                            $newCategory['requiredFields'][] =$tabField->handle;
-                        }
-                    }
-                }
-            }
+        if ($fullExport) {
+          $this->getFieldLayout($category->getFieldLayout(), $newCategory);
         }
 
         if ($fullExport) {
@@ -82,31 +63,30 @@ class Categories extends BaseMigration
      */
     public function importItem(Array $data)
     {
+      $existing = Craft::$app->categories->getGroupByHandle($data['handle']);
 
-        $existing = Craft::$app->categories->getGroupByHandle($data['handle']);
+      if ($existing) {
+        $this->mergeUpdates($data, $existing);
+      }
 
-        if ($existing) {
-            $this->mergeUpdates($data, $existing);
-        }
+      $category = $this->createModel($data);
+      $event = $this->onBeforeImport($category, $data);
 
-        $category = $this->createModel($data);
-        $event = $this->onBeforeImport($category, $data);
+      if ($event->isValid) {
+          $result = Craft::$app->categories->saveGroup($event->element);
+          if ($result) {
+            $this->onAfterImport($event->element, $data);
+          } else {
+            $this->addError('error', 'Could not save the ' . $data['handle'] . ' category.');
+          }
 
-        if ($event->isValid) {
-            $result = Craft::$app->categories->saveGroup($event->element);
-            if ($result) {
-                $this->onAfterImport($event->element, $data);
-            } else {
-                $this->addError('error', 'Could not save the ' . $data['handle'] . ' category.');
-            }
+      } else {
+          $this->addError('error', 'Error importing ' . $data['handle'] . ' field.');
+          $this->addError('error', $event->error);
+          return false;
+      }
 
-        } else {
-            $this->addError('error', 'Error importing ' . $data['handle'] . ' field.');
-            $this->addError('error', $event->error);
-            return false;
-        }
-
-        return $result;
+      return $result;
     }
 
     /**
@@ -117,7 +97,11 @@ class Categories extends BaseMigration
     {
         $category = new CategoryGroup();
         if (array_key_exists('id', $data)){
-            $category->id = $data['id'];
+          $category->id = $data['id'];
+        }
+
+        if (array_key_exists('uid', $data)) {
+          $category->uid = $data['uid'];
         }
 
         $category->name = $data['name'];
@@ -139,40 +123,14 @@ class Categories extends BaseMigration
             $category->setSiteSettings($allSiteSettings);
         }
 
-        if (array_key_exists('fieldLayout', $data)) {
-
-            $requiredFields = array();
-            if (array_key_exists('requiredFields', $data)) {
-                foreach ($data['requiredFields'] as $handle) {
-                    $field = Craft::$app->fields->getFieldByHandle($handle);
-                    if ($field) {
-                        $requiredFields[] = $field->id;
-                    }
-                }
-            }
-
-            $layout = array();
-            foreach ($data['fieldLayout'] as $key => $fields) {
-                $fieldIds = array();
-                foreach ($fields as $field) {
-                    $existingField = Craft::$app->fields->getFieldByHandle($field);
-                    if ($existingField) {
-                        $fieldIds[] = $existingField->id;
-                    } else {
-                        $this->addError('error', 'Missing field: ' . $field . ' can not add to field layout for Category: ' . $category->handle);
-                    }
-                }
-                $layout[$key] = $fieldIds;
-            }
-
-
-            $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
-            $fieldLayout->type = Category::class;
-            $category->fieldLayout = $fieldLayout;
-
+        $fieldLayout = $this->createFieldLayout($data);
+        if ($fieldLayout) {
+          $fieldLayout->type = Category::class;
+          $fieldLayout->id = $category->id;
+          $category->setFieldLayout($fieldLayout);
         }
-        return $category;
 
+        return $category;
     }
 
     /**
@@ -182,6 +140,10 @@ class Categories extends BaseMigration
     private function mergeUpdates(&$newSource, $source)
     {
         $newSource['id'] = $source->id;
+        if (property_exists($source, 'uid')){
+          $newSource['uid'] = $source->uid;
+        }
+
     }
 
 }

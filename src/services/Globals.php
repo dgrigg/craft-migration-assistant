@@ -37,24 +37,11 @@ class Globals extends BaseMigration
         ];
 
         $this->addManifest($set->handle);
-
-        $fieldLayout = $set->getFieldLayout();
-
-        foreach ($fieldLayout->getTabs() as $tab) {
-            $newSet['fieldLayout'][$tab->name] = array();
-            foreach ($tab->getFields() as $tabField) {
-                $newSet['fieldLayout'][$tab->name][] = $tabField->handle;
-                if ($tabField->required) {
-                    $newSet['requiredFields'][] = $tabField->handle;
-                }
-            }
-        }
+        $this->getFieldLayout($set->getFieldLayout(), $newSet);
 
         if ($fullExport) {
             $newSet = $this->onBeforeExport($set, $newSet);
         }
-
-
 
         return $newSet;
     }
@@ -97,35 +84,11 @@ class Globals extends BaseMigration
         $globalSet->name = $data['name'];
         $globalSet->handle = $data['handle'];
 
-        $requiredFields = array();
-        if (array_key_exists('requiredFields', $data)) {
-            foreach ($data['requiredFields'] as $handle) {
-                $field = Craft::$app->fields->getFieldByHandle($handle);
-                if ($field) {
-                    $requiredFields[] = $field->id;
-                }
-            }
+        $fieldLayout = $this->createFieldLayout($data);
+        if ($fieldLayout) {
+          $fieldLayout->type = GlobalSet::class;
+          $globalSet->setFieldLayout($fieldLayout);
         }
-
-        $layout = array();
-        foreach ($data['fieldLayout'] as $key => $fields) {
-            $fieldIds = array();
-
-            foreach ($fields as $field) {
-                $existingField = Craft::$app->fields->getFieldByHandle($field);
-
-                if ($existingField) {
-                    $fieldIds[] = $existingField->id;
-                } else {
-                    $this->addError('error', 'Missing field: ' . $field . ' can not add to field layout for Global: ' . $globalSet->handle);
-                }
-            }
-            $layout[$key] = $fieldIds;
-        }
-
-        $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
-        $fieldLayout->type = GlobalSet::class;
-        $globalSet->setFieldLayout($fieldLayout);
 
         return $globalSet;
     }

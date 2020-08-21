@@ -251,7 +251,7 @@ class Migrations extends Component
             foreach ($this->_settingsDependencyTypes as $key => $value) {
                 $service = $plugin->get($value);
                 if (array_key_exists($service->getDestination(), $data['settings']['dependencies'])) {
-                   
+
                     $service->import($data['settings']['dependencies'][$service->getDestination()]);
                     if ($service->hasErrors()) {
                         $errors = $service->getErrors();
@@ -332,12 +332,12 @@ class Migrations extends Component
         foreach ($migrationNames as $migrationName) {
              try {
                 $migrator = Craft::$app->getContentMigrator();
+                $migrator->removeMigrationHistory($migrationName);
                 $migrator->migrateUp($migrationName);
             } catch (MigrationException $e) {
                 $this->addError('error', $e->getMessage());
                 Craft::error('Migration failed. The rest of the migrations are cancelled.', __METHOD__);
-                //throw $e;
-                //$this->errorMessage
+
                 return false;
             }
         }

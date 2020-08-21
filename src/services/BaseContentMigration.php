@@ -96,6 +96,7 @@ abstract class BaseContentMigration extends BaseMigration
                 break;
             case 'typedlinkfield\fields\LinkField':
                 $elementTypes = ['asset','category','entry','user'];
+
                 if (in_array($value->type, $elementTypes)){
                     $elementType = 'craft\\elements\\' . ucfirst($value->type);
                     $element = Craft::$app->elements->getElementById($value->value, $elementType);

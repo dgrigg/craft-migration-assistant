@@ -7,9 +7,11 @@ use craft\models\Section;
 use craft\models\Section_SiteSettings;
 use craft\models\EntryType;
 use craft\models\Entry;
+use craft\models\FieldLayout;
+use craft\models\FieldLayoutTab;
+use craft\services\Fields;
 use dgrigg\migrationassistant\events\ExportEvent;
 use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
-
 
 class Sections extends BaseMigration
 {
@@ -70,42 +72,31 @@ class Sections extends BaseMigration
             ];
         }
 
-
         $newSection['entrytypes'] = array();
 
         $sectionEntryTypes = $section->getEntryTypes();
         foreach ($sectionEntryTypes as $entryType) {
-            $newEntryType = [
-                'sectionHandle' => $section->attributes['handle'],
-                'hasTitleField' => $entryType->attributes['hasTitleField'],
-                'titleLabel' => $entryType->attributes['titleLabel'],
-                'titleFormat' => $entryType->attributes['titleFormat'],
-                'name' => $entryType->attributes['name'],
-                'handle' => $entryType->attributes['handle'],
-                'fieldLayout' => array(),
-                'requiredFields' => array(),
-            ];
+          $newEntryType = [
+              'sectionHandle' => $section->attributes['handle'],
+              'hasTitleField' => $entryType->attributes['hasTitleField'],
+              'titleFormat' => $entryType->attributes['titleFormat'],
+              'name' => $entryType->attributes['name'],
+              'handle' => $entryType->attributes['handle'],
+              'requiredFields' => array(),
+          ];
 
-            if ($newEntryType['titleFormat'] === null) {
-                unset($newEntryType['titleFormat']);
-            }
+          if (array_key_exists('titleLabel', $entryType->attributes)) {
+            $newEntryType['titleLabel'] = $entryType->attributes['titleLabel'];
+          }
 
-            $fieldLayout = $entryType->getFieldLayout();
+          if ($newEntryType['titleFormat'] === null) {
+              unset($newEntryType['titleFormat']);
+          }
 
-            foreach ($fieldLayout->getTabs() as $tab) {
-                $newEntryType['fieldLayout'][$tab->name] = array();
-                foreach ($tab->getFields() as $tabField) {
+          $this->getFieldLayout($entryType->getFieldLayout(), $newEntryType);
 
-                    $newEntryType['fieldLayout'][$tab->name][] = $tabField->handle;
-                    if ($tabField->required) {
-                        $newEntryType['requiredFields'][] = $tabField->handle;
-                    }
-                }
-            }
-
-            array_push($newSection['entrytypes'], $newEntryType);
+          array_push($newSection['entrytypes'], $newEntryType);
         }
-
 
         if ($fullExport) {
             $newSection = $this->onBeforeExport($section, $newSection);
@@ -145,15 +136,16 @@ class Sections extends BaseMigration
 
                     //add entry types
                     foreach ($data['entrytypes'] as $key => $newEntryType) {
+
                         $existingType = $this->getSectionEntryTypeByHandle($newEntryType['handle'], $section->id);
                         if ($existingType) {
-                            $this->mergeEntryType($newEntryType, $existingType);
+                          $this->mergeEntryType($newEntryType, $existingType);
                         }
 
                         $entryType = $this->createEntryType($newEntryType, $section);
 
                         if (!Craft::$app->sections->saveEntryType($entryType)) {
-                            $result = false;
+                          $result = false;
                         }
                     }
                 } else {
@@ -233,49 +225,37 @@ class Sections extends BaseMigration
      *
      * @return EntryTypeModel
      */
-    private function createEntryType($data, $section)
+    private function createEntryType(&$data, $section)
     {
         $entryType = new EntryType(array(
             'sectionId' => $section->id,
             'name' => $data['name'],
             'handle' => $data['handle'],
-            'hasTitleField' => $data['hasTitleField'],
-            'titleLabel' => $data['titleLabel'],
+            'hasTitleField' => $data['hasTitleField']
         ));
 
         if (array_key_exists('titleFormat', $data)) {
             $entryType->titleFormat = $data['titleFormat'];
         }
 
+        if (array_key_exists('titleLabel', $data)) {
+          $entryType->titleFormat = $data['titleLabel'];
+        }
+
         if (array_key_exists('id', $data)) {
-            $entryType->id = $data['id'];
+          $entryType->id = $data['id'];
         }
 
-        $requiredFields = array();
-        if (array_key_exists('requiredFields', $data)) {
-            foreach ($data['requiredFields'] as $handle) {
-                $field = Craft::$app->fields->getFieldByHandle($handle);
-                if ($field) {
-                    $requiredFields[] = $field->id;
-                }
-            }
+        if (array_key_exists('uid', $data)) {
+          $entryType->uid = $data['uid'];
         }
 
-        $layout = array();
-        foreach ($data['fieldLayout'] as $key => $fields) {
-            $fieldIds = array();
-            foreach ($fields as $field) {
-                $existingField = Craft::$app->fields->getFieldByHandle($field);
-                if ($existingField) {
-                    $fieldIds[] = $existingField->id;
-                }
-            }
-            $layout[$key] = $fieldIds;
+        $fieldLayout = $this->createFieldLayout($data);
+        if ($fieldLayout) {
+          $fieldLayout->type = Entry::class;
+          $fieldLayout->id = $entryType->id;
+          $entryType->setFieldLayout($fieldLayout);
         }
-
-        $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
-        $fieldLayout->type = Entry::class;
-        $entryType->fieldLayout = $fieldLayout;
 
         return $entryType;
     }
@@ -287,6 +267,7 @@ class Sections extends BaseMigration
     private function mergeUpdates(&$newSection, $section)
     {
         $newSection['id'] = $section->id;
+
     }
 
     /**
@@ -296,6 +277,10 @@ class Sections extends BaseMigration
     private function mergeEntryType(&$newEntryType, $entryType)
     {
         $newEntryType['id'] = $entryType->id;
+
+        if (property_exists($entryType, 'uid')){
+          $newEntryType['uid'] = $entryType->uid;
+        }
     }
 
     /**

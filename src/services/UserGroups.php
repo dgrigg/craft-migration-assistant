@@ -39,20 +39,8 @@ class UserGroups extends BaseMigration
         $this->addManifest($group->handle);
 
         if ($fullExport) {
-            $newGroup['fieldLayout'] = array();
-            $newGroup['requiredFields'] = array();
-            $fieldLayout = Craft::$app->fields->getLayoutByType(User::class);
 
-            foreach ($fieldLayout->getTabs() as $tab) {
-                $newGroup['fieldLayout'][$tab->name] = array();
-                foreach ($tab->getFields() as $tabField) {
-
-                    $newGroup['fieldLayout'][$tab->name][] = $tabField->handle;
-                    if ($tabField->required) {
-                        $newGroup['requiredFields'][] = $tabField->handle;
-                    }
-                }
-            }
+            $this->getFieldLayout(Craft::$app->fields->getLayoutByType(User::class), $newGroup);
 
             $newGroup['permissions'] = $this->getGroupPermissionHandles($id);
             $newGroup['settings'] = Craft::$app->systemSettings->getSettings('users');
@@ -142,41 +130,21 @@ class UserGroups extends BaseMigration
         $userGroup->name = $data['name'];
         $userGroup->handle = $data['handle'];
 
-        if (array_key_exists('fieldLayout', $data)) {
-            $requiredFields = array();
-            if (array_key_exists('requiredFields', $data)) {
-                foreach ($data['requiredFields'] as $handle) {
-                    $field = Craft::$app->fields->getFieldByHandle($handle);
-                    if ($field) {
-                        $requiredFields[] = $field->id;
-                    }
-                }
-            }
+        if (array_key_exists('fieldLayout', $data) || array_key_exists('fieldLayouts', $data)) {
 
-            $layout = array();
-            foreach ($data['fieldLayout'] as $key => $fields) {
-                $fieldIds = array();
-                foreach ($fields as $field) {
-                    $existingField = Craft::$app->fields->getFieldByHandle($field);
-                    if ($existingField) {
-                        $fieldIds[] = $existingField->id;
-                    } else {
-                        $this->addError('error', 'Missing field: ' . $field . ' can not add to field layout for User Group: ' . $userGroup->handle);
-                    }
-                }
-                $layout[$key] = $fieldIds;
-            }
+          $layout = Craft::$app->fields->getLayoutByType(User::class);
 
-            $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
+          $fieldLayout = $this->createFieldLayout($data);
+          if ($fieldLayout) {
             $fieldLayout->type = User::class;
-
-            Craft::$app->fields->deleteLayoutsByType(User::class);
+            $fieldLayout->id = $layout->id;
 
             if (Craft::$app->fields->saveLayout($fieldLayout)) {
 
             } else {
                 $this->addError('error', Craft::t('Couldn’t save user fields.'));
             }
+          }
         }
 
         return $userGroup;
