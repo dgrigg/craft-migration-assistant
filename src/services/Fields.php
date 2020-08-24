@@ -705,7 +705,7 @@ class Fields extends BaseMigration
                 {
                     $type = $newSource->type == "single" ? "single" : "section";
 
-					$newSources[] = $type.':' . (MigrationManagerHelper::isVersion('3.1') ? $newSource->uid : $newSource->id);
+                    $newSources[] = $type.':' . (MigrationManagerHelper::isVersion('3.1') ? $newSource->uid : $newSource->id);
                 }
                 elseif ($source == 'singles')
                 {
