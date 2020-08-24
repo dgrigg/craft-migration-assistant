@@ -44,6 +44,7 @@ class UserGroups extends BaseMigration
 
             $newGroup['permissions'] = $this->getGroupPermissionHandles($id);
             $newGroup['settings'] = Craft::$app->systemSettings->getSettings('users');
+            unset($newGroup['settings']['groups']);
 
             if ($newGroup['settings']['defaultGroup'] != null) {
                 if (MigrationManagerHelper::isVersion('3.1')) {
