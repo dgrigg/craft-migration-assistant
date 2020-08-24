@@ -224,6 +224,8 @@ class MigrationManagerHelper
                     $element = Craft::$app->categories->getGroupByHandle($permissionParts[1]);
                 } elseif (preg_match('/globalset/', $permissionParts[0])) {
                     $element = Craft::$app->globals->getSetByHandle($permissionParts[1]);
+                } elseif (preg_match('/sites/', $permissionParts[0])) {
+                    $element = Craft::$app->sites->getSiteByHandle($permissionParts[1]);
                 }
 
                 if ($element != null) {
@@ -257,6 +259,8 @@ class MigrationManagerHelper
                     $element = $hasUids ? Craft::$app->categories->getGroupByUid($permissionParts[1]) : Craft::$app->categories->getGroupById($permissionParts[1]);
                 } elseif (preg_match('/globalset/', $permissionParts[0])) {
                     $element = $hasUids ? MigrationManagerHelper::getGlobalSetByUid($permissionParts[1]) : Craft::$app->globals->getSetByid($permissionParts[1]);
+                } elseif (preg_match('/sites/', $permissionParts[0])) {
+                    $element = $hasUids ? Craft::$app->sites->getSiteByUid($permissionParts[1]) : Craft::$app->sites->getSiteById($permissionParts[1]);
                 }
 
                 if ($element != null) {
