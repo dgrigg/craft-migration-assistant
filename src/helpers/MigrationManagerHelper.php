@@ -224,7 +224,7 @@ class MigrationManagerHelper
                     $element = Craft::$app->categories->getGroupByHandle($permissionParts[1]);
                 } elseif (preg_match('/globalset/', $permissionParts[0])) {
                     $element = Craft::$app->globals->getSetByHandle($permissionParts[1]);
-                } elseif (preg_match('/sites/', $permissionParts[0])) {
+                } elseif (preg_match('/site/', $permissionParts[0])) {
                     $element = Craft::$app->sites->getSiteByHandle($permissionParts[1]);
                 }
 
