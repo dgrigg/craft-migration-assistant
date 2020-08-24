@@ -259,7 +259,7 @@ class MigrationManagerHelper
                     $element = $hasUids ? Craft::$app->categories->getGroupByUid($permissionParts[1]) : Craft::$app->categories->getGroupById($permissionParts[1]);
                 } elseif (preg_match('/globalset/', $permissionParts[0])) {
                     $element = $hasUids ? MigrationManagerHelper::getGlobalSetByUid($permissionParts[1]) : Craft::$app->globals->getSetByid($permissionParts[1]);
-                } elseif (preg_match('/sites/', $permissionParts[0])) {
+                } elseif (preg_match('/site/', $permissionParts[0])) {
                     $element = $hasUids ? Craft::$app->sites->getSiteByUid($permissionParts[1]) : Craft::$app->sites->getSiteById($permissionParts[1]);
                 }
 
