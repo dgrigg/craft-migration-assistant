@@ -1,5 +1,11 @@
 # Migration Assistant Changelog
 
+## 3.2.0 - 2020-09-04
+
+### Fixed
+- fixed issue with fieldHandle throwing error during migration
+- updated user group permissions
+
 ## 3.1.9 - 2020-08-20
 
 ### Added

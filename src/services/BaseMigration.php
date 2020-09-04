@@ -243,8 +243,8 @@ abstract class BaseMigration extends Component implements IMigrationService
               $existingField = Craft::$app->fields->getFieldByHandle($tabElement['fieldHandle']);
               if ($existingField) {
                 $tabElement['fieldUid'] = $existingField->uid;
-                unset($tabElement['fieldHandle']);
               }
+              unset($tabElement['fieldHandle']);
             }
           }
         }
