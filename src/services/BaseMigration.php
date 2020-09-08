@@ -238,13 +238,17 @@ abstract class BaseMigration extends Component implements IMigrationService
       if (MigrationManagerHelper::isVersion('3.5')){
         $fieldLayout = new FieldLayout();
         foreach ($data['fieldLayouts']['tabs'] as &$tab) {
-          foreach ($tab['elements'] as &$tabElement) {
+          foreach ($tab['elements'] as $key => &$tabElement) {
             if ($tabElement['type'] == 'craft\\fieldlayoutelements\\CustomField') {
               $existingField = Craft::$app->fields->getFieldByHandle($tabElement['fieldHandle']);
               if ($existingField) {
                 $tabElement['fieldUid'] = $existingField->uid;
+              } else {
+                //remove the field from the layout since it doesn't exist yet
+                unset($tab['elements'][$key]);
               }
               unset($tabElement['fieldHandle']);
+
             }
           }
         }
