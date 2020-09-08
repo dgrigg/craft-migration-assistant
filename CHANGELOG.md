@@ -1,5 +1,8 @@
 # Migration Assistant Changelog
 
+## 3.2.1 - 2020-09-08
+- fixed issue with circular reference in section migrations
+
 ## 3.2.0 - 2020-09-04
 
 ### Fixed
