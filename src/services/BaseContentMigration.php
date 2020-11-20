@@ -468,9 +468,13 @@ abstract class BaseContentMigration extends BaseMigration
        $elementTypes = ['asset','category','entry','user'];
         if (in_array($element['type'], $elementTypes)){
             $value = $element['value'];
-            $this->populateIds($value);
-            if (count($value) > 0){
-                $element['value'] = $value[0];
+            if ($value != null) {
+              $this->populateIds($value);
+              if (count($value) > 0){
+                  $element['value'] = $value[0];
+              }
+            } else {
+              $value = null;
             }
         } elseif ($element['type'] == 'site'){
             $site = Craft::$app->sites->getSiteByHandle($element['value']);
