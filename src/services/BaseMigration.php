@@ -252,6 +252,7 @@ abstract class BaseMigration extends Component implements IMigrationService
             }
           }
         }
+        Craft::error(json_encode($data['fieldLayouts']['tabs']));
         $fieldLayout->setTabs($data['fieldLayouts']['tabs']);
       } else {
         $layout = [];

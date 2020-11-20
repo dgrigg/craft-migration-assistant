@@ -99,8 +99,10 @@ abstract class BaseContentMigration extends BaseMigration
 
                 if (in_array($value->type, $elementTypes)){
                     $elementType = 'craft\\elements\\' . ucfirst($value->type);
-                    $element = Craft::$app->elements->getElementById($value->value, $elementType);
-                    $value->value = [$this->getSourceHandle($element, $elementType)];
+                    if ($value->value != null){
+                      $element = Craft::$app->elements->getElementById($value->value, $elementType);
+                      $value->value = [$this->getSourceHandle($element, $elementType)];
+                    }
                 } elseif ($value->type == 'site'){
                     $site = Craft::$app->sites->getSiteById($value->value);
                     $value->value = $site->handle;

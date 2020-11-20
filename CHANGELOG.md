@@ -1,5 +1,8 @@
 # Migration Assistant Changelog
 
+## 3.2.2 - 2020-11-20
+- fixed bug with LinkField and null values
+
 ## 3.2.1 - 2020-09-08
 - fixed issue with circular reference in section migrations
 
