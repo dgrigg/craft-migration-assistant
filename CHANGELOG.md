@@ -1,5 +1,9 @@
 # Migration Assistant Changelog
 
+## 3.2.4 - 2020-12-11
+- fixed setting to enforce migration permissions for Globals content
+- cleaned up button placement for Create Migration button in Globals
+
 ## 3.2.3 - 2020-11-20
 - fixed bug with LinkField and null values
 

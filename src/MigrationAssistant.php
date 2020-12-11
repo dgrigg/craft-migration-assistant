@@ -115,7 +115,7 @@ class MigrationAssistant extends Plugin
                $variable->set('migrationassistant', MigrationManagerVariable::class);
             }
          );
-   
+
         // Register actions only if Solo license or user has rights
         if (Craft::$app->getEdition() > Craft::Solo && (Craft::$app->user->checkPermission('createContentMigrations') == true || Craft::$app->getUser()->getIsAdmin())
            || Craft::$app->getEdition() === Craft::Solo) {
@@ -125,20 +125,27 @@ class MigrationAssistant extends Plugin
                  $event->actions[] = MigrateEntryElementAction::class;
               }
            );
-   
+
            Event::on(Category::class, Element::EVENT_REGISTER_ACTIONS,
               function (RegisterElementActionsEvent $event) {
                  $event->actions[] = MigrateCategoryElementAction::class;
               }
            );
-   
+
            Event::on(User::class, Element::EVENT_REGISTER_ACTIONS,
               function (RegisterElementActionsEvent $event) {
                  $event->actions[] = MigrateUserElementAction::class;
               }
            );
+
+           $request = Craft::$app->getRequest();
+           if (!$request->getIsConsoleRequest() && $request->getSegment(1) == 'globals'){
+              $view = Craft::$app->getView();
+              $view->registerAssetBundle(CpGlobalsAssetBundle::class);
+              $view->registerJs('new Craft.MigrationManagerGlobalsExport();', View::POS_END);
+           }
         }
-   
+
        Event::on(
           UserPermissions::class,
           UserPermissions::EVENT_REGISTER_PERMISSIONS,
@@ -151,12 +158,7 @@ class MigrationAssistant extends Plugin
           }
        );
 
-        $request = Craft::$app->getRequest();
-        if (!$request->getIsConsoleRequest() && $request->getSegment(1) == 'globals'){
-            $view = Craft::$app->getView();
-            $view->registerAssetBundle(CpGlobalsAssetBundle::class);
-            $view->registerJs('new Craft.MigrationManagerGlobalsExport();', View::POS_END);
-        }
+
     }
 
     public function getCpNavItem()

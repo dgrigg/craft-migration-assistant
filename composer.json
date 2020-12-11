@@ -1,7 +1,7 @@
 {
   "name": "dgrigg/craft-migration-assistant",
   "description": "Create migrations for settings and content at the click of a mouse. Keep environments in sync with ease.",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "keywords": [
     "craft",
     "cms",

@@ -4,7 +4,7 @@
       $("input.checkbox.checkbox-toggle").on("click", this.toggleSelections);
       $("input.checkbox.checkbox-all").on("click", this.toggleAllSelections);
 
-      $("#main #header").append(
+      $("#main #header #action-button").append(
         '&nbsp;<a href="#" class="btn submit create-migration">Create Migration</a>'
       );
 

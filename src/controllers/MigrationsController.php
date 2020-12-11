@@ -41,8 +41,6 @@ class MigrationsController extends Controller
     public function actionCreateGlobalsContentMigration()
     {
         $this->requirePostRequest();
-        $this->requireAdmin();
-
         $request = Craft::$app->getRequest();
         $post = $request->post();
         $params['global'] = array($post['setId']);
