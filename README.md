@@ -104,6 +104,7 @@ In addition it also supports:
 
 - [SuperTable](https://github.com/engram-design/SuperTable)
 - [Neo](https://github.com/spicywebau/craft-neo)
+- [LinkField](https://github.com/sebastian-lenz/craft-linkfield)
 
 To support additional field types and special content you can use event handlers for customized import/export functions. There are two distinct types of export/import procedures you need to consider when adding custom support. Exporting/importing element settings and exporting/importing element content.
 

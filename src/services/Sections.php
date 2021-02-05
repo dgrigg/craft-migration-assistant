@@ -125,9 +125,8 @@ class Sections extends BaseMigration
                 if (Craft::$app->sections->saveSection($event->element)) {
                     $this->onAfterImport($event->element, $data);
 
-                    //only need for sections pre project config
-                    if (!MigrationManagerHelper::isVersion('3.1') && !$existing) {
-                        //wipe out the default entry type
+                    if (!$existing) {
+                        //wipe out the default entry type to ensure the correct entry type handle from the migration is used
                         $defaultEntryType = Craft::$app->sections->getEntryTypesBySectionId($section->id);
                         if ($defaultEntryType) {
                             Craft::$app->sections->deleteEntryTypeById($defaultEntryType[0]->id);

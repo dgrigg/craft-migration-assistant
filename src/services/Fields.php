@@ -301,6 +301,7 @@ class Fields extends BaseMigration
                 'name' => $blockType->name,
                 'handle' => $blockType->handle,
                 'maxBlocks' => $blockType->maxBlocks,
+                'maxSiblingBlocks' => $blockType->maxSiblingBlocks,
                 'maxChildBlocks' => $blockType->maxChildBlocks,
                 'childBlocks' => $blockType->childBlocks,
                 'topLevel' => $blockType->topLevel,

@@ -28,12 +28,12 @@ class Sites extends BaseMigration
     {
         $site = Craft::$app->sites->getSiteById($id);
         $newSite = [
-            'name' => $site->name,
+            'name' => $site->getName(false),
             'handle' => $site->handle,
             'group' => $site->group->name,
             'language' => $site->language,
             'hasUrls' => $site->hasUrls,
-            'baseUrl' => $site->baseUrl,
+            'baseUrl' => $site->getBaseUrl(false),
             'primary' => $site->primary,
             'sortOrder' => $site->sortOrder
         ];

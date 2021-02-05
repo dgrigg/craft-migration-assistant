@@ -1,5 +1,14 @@
 # Migration Assistant Changelog
 
+## 3.2.5 - 2021-02-05
+
+### Fixed
+- site name and base url no longer parse the environment variables, the proper variable remains in the migrated value
+- fixed issue with section migrations creating a ghost entry type that matched the default section entry handle when it was not in the migration
+
+### Added
+- Neo migrations include the 'maxSiblingBlocks' attribute
+
 ## 3.2.4 - 2020-12-11
 - fixed setting to enforce migration permissions for Globals content
 - cleaned up button placement for Create Migration button in Globals
