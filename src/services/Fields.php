@@ -182,8 +182,6 @@ class Fields extends BaseMigration
             $group->id = $result['id'];
             $group->name = $result['name'];
             return $group;
-
-
         } else {
             return false;
         }
