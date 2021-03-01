@@ -221,6 +221,7 @@ abstract class BaseMigration extends Component implements IMigrationService
 
     public function createFieldLayout($data)
     {
+
       if (!array_key_exists('fieldLayout', $data) && !array_key_exists('fieldLayouts', $data)){
         return false;
       }
@@ -252,8 +253,8 @@ abstract class BaseMigration extends Component implements IMigrationService
             }
           }
         }
-        Craft::error(json_encode($data['fieldLayouts']['tabs']));
         $fieldLayout->setTabs($data['fieldLayouts']['tabs']);
+
       } else {
         $layout = [];
         foreach ($data['fieldLayout'] as $key => $fields) {

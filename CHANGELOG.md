@@ -1,5 +1,10 @@
 # Migration Assistant Changelog
 
+## 3.2.6 - 2021-03-01
+
+### Fixed
+- fixed issue with Neo blocks having empty Field Layouts after field migrations
+
 ## 3.2.5 - 2021-02-05
 
 ### Fixed

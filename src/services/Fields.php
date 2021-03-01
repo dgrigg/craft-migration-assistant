@@ -84,9 +84,10 @@ class Fields extends BaseMigration
         if ($event->isValid) {
             $result = Craft::$app->fields->saveField($event->element);
             if ($result) {
-                $this->onAfterImport($event->element, $data);
+              //after the field is saved
+              $this->onAfterImport($event->element, $data);
              } else {
-                $this->addError('error', 'Could not save the ' . $data['handle'] . ' field.');
+              $this->addError('error', 'Could not save the ' . $data['handle'] . ' field.');
             }
 
             return $result;
@@ -132,6 +133,32 @@ class Fields extends BaseMigration
         }
 
         $field = $fieldsService->createField($fieldData);
+
+        //if this is a neo field create field layouts
+        if (MigrationManagerHelper::isVersion('3.5')){
+
+          if ($fieldData['type'] == 'benf\neo\Field') {
+
+              $blockTypes = $fieldData['settings']['blockTypes'];
+              $newBlockTypes = [];
+              foreach ($blockTypes as $key => &$block) {
+                $fieldLayout = $this->createFieldLayout($block);
+                $fieldLayout->type = \benf\neo\models\BlockType::class;
+                unset($block['fieldLayout']);
+                unset($block['fieldLayouts']);
+                $newBlockType = new \benf\neo\models\BlockType($block);
+                $newBlockType->setFieldLayout($fieldLayout);
+
+                if (Craft::$app->fields->saveLayout($fieldLayout)) {
+                  $newBlockType->fieldLayoutId = $fieldLayout->id;
+                  $newBlockTypes[] = $newBlockType;
+                } else {
+                    $this->addError('error', Craft::t('Could not save Neo block type ' . $block['handle']));
+                }
+              }
+              $field->setBlockTypes($newBlockTypes);
+          }
+        }
 
         return $field;
     }
@@ -306,19 +333,22 @@ class Fields extends BaseMigration
                 'childBlocks' => $blockType->childBlocks,
                 'topLevel' => $blockType->topLevel,
                 'sortOrder' => $blockType->sortOrder,
-                'fieldLayout' => []
             ];
 
-            $fieldLayout = $blockType->getFieldLayout();
-            foreach ($fieldLayout->getTabs() as $tab) {
-                $newField['typesettings']['blockTypes'][$blockId]['fieldLayout'][$tab->name] = array();
-                foreach ($tab->getFields() as $tabField) {
-                    $newField['typesettings']['blockTypes'][$blockId]['fieldLayout'][$tab->name][] = $this->exportItem($tabField->id, true);
-                    if ($tabField->required)
-                    {
-                        $newField['typesettings']['blockTypes'][$blockId]['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->id)->handle;
-                    }
-                }
+            if (MigrationManagerHelper::isVersion('3.5')){
+              $this->getFieldLayout($blockType->getFieldLayout(), $newField['typesettings']['blockTypes'][$blockId]);
+            } else {
+              $fieldLayout = $blockType->getFieldLayout();
+              foreach ($fieldLayout->getTabs() as $tab) {
+                  $newField['typesettings']['blockTypes'][$blockId]['fieldLayout'][$tab->name] = array();
+                  foreach ($tab->getFields() as $tabField) {
+                      $newField['typesettings']['blockTypes'][$blockId]['fieldLayout'][$tab->name][] = $this->exportItem($tabField->id, true);
+                      if ($tabField->required)
+                      {
+                          $newField['typesettings']['blockTypes'][$blockId]['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->id)->handle;
+                      }
+                  }
+              }
             }
             ++$blockCount;
         }
@@ -950,9 +980,9 @@ class Fields extends BaseMigration
                 $existingBlock = $this->getNeoBlockByHandle($block['handle'], $field->id);
 
                 if ($existingBlock) {
-                    $newBlocks[$existingBlock->id] = $block;
+                  $newBlocks[$existingBlock->id] = $block;
                 } else {
-                    $newBlocks[$key] = $block;
+                  $newBlocks[$key] = $block;
                 }
             }
 
