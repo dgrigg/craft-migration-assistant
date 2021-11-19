@@ -1,7 +1,7 @@
 {
   "name": "dgrigg/craft-migration-assistant",
   "description": "Create migrations for settings and content at the click of a mouse. Keep environments in sync with ease.",
-  "version": "3.2.6",
+  "version": "3.2.7",
   "keywords": [
     "craft",
     "cms",
@@ -11,10 +11,12 @@
     "migration manager",
     "migration assistant"
   ],
-  "authors": [{
-    "name": "Derrick Grigg",
-    "email": "derrick@dgrigg.com"
-  }],
+  "authors": [
+    {
+      "name": "Derrick Grigg",
+      "email": "derrick@dgrigg.com"
+    }
+  ],
   "support": {
     "docs": "https://github.com/dgrigg/craft-migration-assistant/blob/master/README.md",
     "issues": "https://github.com/dgrigg/craft-migration-assistant/issues"

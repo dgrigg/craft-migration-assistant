@@ -1,53 +1,68 @@
 # Migration Assistant Changelog
 
+## 3.2.7 - 2021-11-19
+
+- fixed field layout issue with Neo fields
+
 ## 3.2.6 - 2021-03-01
 
 ### Fixed
+
 - fixed issue with Neo blocks having empty Field Layouts after field migrations
 
 ## 3.2.5 - 2021-02-05
 
 ### Fixed
+
 - site name and base url no longer parse the environment variables, the proper variable remains in the migrated value
 - fixed issue with section migrations creating a ghost entry type that matched the default section entry handle when it was not in the migration
 
 ### Added
+
 - Neo migrations include the 'maxSiblingBlocks' attribute
 
 ## 3.2.4 - 2020-12-11
+
 - fixed setting to enforce migration permissions for Globals content
 - cleaned up button placement for Create Migration button in Globals
 
 ## 3.2.3 - 2020-11-20
+
 - fixed bug with LinkField and null values
 
 ## 3.2.1 - 2020-09-08
+
 - fixed issue with circular reference in section migrations
 
 ## 3.2.0 - 2020-09-04
 
 ### Fixed
+
 - fixed issue with fieldHandle throwing error during migration
 - updated user group permissions
 
 ## 3.1.9 - 2020-08-20
 
 ### Added
+
 - support for new Entry Type layouts and elements in Craft 3.5
 
 ### Fixed
+
 - fixed issue with null path when migration assets
 - fixed 'titleLabel' bug when creating migrations in Craft 3.5
 
 ## 3.1.8 - 2020-06-13
 
 ### Fixed
+
 - fixed issue introduced with Craft 3.2.0 with order of items in Matrix/Neo/SuperTables
 - fixed entry enabled/disabled setting on content migrations for site/locale entries
 
 ## 3.1.7 - 2020-06-12
 
 ### Fixed
+
 - section `Propagation Method` added to export data
 - fixed bug with entry being duplicated when `Progogration Method` is set to 'Only save entries to the site they were created in' on content migrations
 - assets in deep folders are now located correctly during content migrations
@@ -56,32 +71,38 @@
 ## 3.1.6 - 2019-12-23
 
 ### Fixed
+
 - matrix content migrations sort order, block order now imports in correct sequence
 
 ## 3.1.5 - 2019-09-20
 
 ### Fixed
+
 - structure entries with an unpublished parent entry where not being associated to the parent entry
 
 ## 3.1.4 - 2019-09-03
 
 ### Added
+
 - entry exports now include the author field value
 - added support for the Link Field plugin field type https://github.com/sebastian-lenz/craft-linkfield
 
 ### Fixed
+
 - fixed issue with empty values in Entry fields contained within Matrix blocks that are translatable
 - fixed entry source handle for single entry sections
 
 ## 3.1.3 - 2019-07-23
 
 ### Fixed
+
 - entry imports now recognize timezone value for post and expiry dates
 - fixed bug with duplicate entries being created during import for non live entries
 
 ## 3.1.2 - 2019-05-31
 
 ### Fixed
+
 - export UID on entry content exports to prevent null error during import
 - fixed invalid postDate error for content entry imports
 - fixed user group export issue with uid
@@ -89,6 +110,7 @@
 ## 3.1.1 - 2019-05-09
 
 ### Fixed
+
 - fixed issue for PostgresSQL creating fields
 
 ## 3.1.0 - 2019-03-08
