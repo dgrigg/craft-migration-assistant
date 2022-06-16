@@ -1,7 +1,7 @@
 {
   "name": "dgrigg/craft-migration-assistant",
   "description": "Create migrations for settings and content at the click of a mouse. Keep environments in sync with ease.",
-  "version": "3.2.7",
+  "version": "4.0.0-beta.1",
   "keywords": [
     "craft",
     "cms",
@@ -24,7 +24,8 @@
   "license": "proprietary",
   "type": "craft-plugin",
   "require": {
-    "craftcms/cms": "^3.0.1"
+    "php": "^8.0.2",
+    "craftcms/cms": "^4.0.0"
   },
   "autoload": {
     "psr-4": {
@@ -40,5 +41,16 @@
     "hasCpSettings": false,
     "hasCpSection": true,
     "changelogUrl": "https://raw.githubusercontent.com/dgrigg/craft-migration-assistant/master/CHANGELOG.md"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require-dev": {
+    "craftcms/rector": "dev-main"
+  },
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
   }
 }

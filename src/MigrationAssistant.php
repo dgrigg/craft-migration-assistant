@@ -161,7 +161,7 @@ class MigrationAssistant extends Plugin
 
     }
 
-    public function getCpNavItem()
+    public function getCpNavItem(): ?array
     {
         $item = parent::getCpNavItem();
         //$item['label'] = 'Migrations';
