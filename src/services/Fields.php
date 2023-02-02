@@ -294,7 +294,6 @@ class Fields extends BaseMigration
    */
   private function getNeoField(&$newField, $fieldId, $includeID = false)
   {
-
     $neo = Craft::$app->plugins->getPlugin('neo');
     $groups = $neo->blockTypes->getGroupsByFieldId($fieldId);
     if (count($groups)) {
@@ -303,7 +302,7 @@ class Fields extends BaseMigration
       foreach ($groups as $group) {
         $newField['typesettings']['groups']['uid' . $groupId] = [
           'name' => $group->name,
-          'sortOrder' => $group->sortOrder
+          'sortOrder' => $group->sortOrder,
         ];
         $groupId++;
       }

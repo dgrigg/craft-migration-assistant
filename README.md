@@ -1,5 +1,7 @@
 # Migration Assistant for [Craft CMS 3](https://craftcms.com/)
 
+**This plugin does not support Craft 4. Craft 4 has [project config](https://craftcms.com/docs/4.x/project-config.html) always on which means migrations are no longer needed to move settings/config between environments. Thanks to everyone who supported this plugin.**
+
 Create migrations to easily move settings and content between CraftCMS website installations with the click of a mouse, no coding required. You can select which elements to migrate and create a native Craft content migration file that can be committed to your version control system. The migration(s) can then be applied on different CraftCMS installations to instantly create and update settings and content, without needing to enter data multiple times. By using migrations you can ensure your various website environments (local, staging, production, etc.) stay in sync and up to date.
 
 Formely: [Migration Manager](https://github.com/Firstborn/Craft-Migration-Manager)
