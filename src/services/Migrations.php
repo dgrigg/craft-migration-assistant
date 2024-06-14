@@ -52,7 +52,7 @@ class Migrations extends Component
                     $errors = $service->getErrors();
                     foreach ($errors as $error) {
                         Craft::error($error);
-                        $this->addError('error', $error);
+                        $this->addError($error);
                     }
 
                     return false;
@@ -152,67 +152,14 @@ class Migrations extends Component
                         $errors = $service->getErrors();
                         foreach ($errors as $error) {
                             Craft::error($error, __METHOD__);
-                            $this->addError('error', $error);
+                            $this->addError($error);
                         }
                         return false;
                     }
                 }
             }
         }
-
-
         return true;
-    }
-
-    /**
-     * Upgrades the application by applying new migrations.
-     *
-     * @param int $limit The number of new migrations to be applied. If 0, it means
-     * applying all available new migrations.
-     * @throws MigrationException on migrate failure
-     */
-    public function up(int $limit = 0): void
-    {
-        // This might take a while
-        App::maxPowerCaptain();
-
-        $migrationNames = $this->getNewMigrations();
-
-        if (empty($migrationNames)) {
-            Craft::info('No new migration found. Your system is up to date.', __METHOD__);
-            return;
-        }
-
-        $total = count($migrationNames);
-
-        if ($limit !== 0) {
-            $migrationNames = array_slice($migrationNames, 0, $limit);
-        }
-
-        $n = count($migrationNames);
-
-        if ($n === $total) {
-            $logMessage = "Total $n new " . ($n === 1 ? 'migration' : 'migrations') . ' to be applied:';
-        } else {
-            $logMessage = "Total $n out of $total new " . ($total === 1 ? 'migration' : 'migrations') . ' to be applied:';
-        }
-
-        foreach ($migrationNames as $migrationName) {
-            $logMessage .= "\n\t$migrationName";
-        }
-
-        Craft::info($logMessage, __METHOD__);
-
-        foreach ($migrationNames as $migrationName) {
-            try {
-                $this->migrateUp($migrationName);
-            } catch (MigrationException $e) {
-                Craft::error('Migration failed. The rest of the migrations are cancelled.', __METHOD__);
-                throw $e;
-            }
-        }
-
-        Craft::info('Migrated up successfully.', __METHOD__);
     }
 
     /**
@@ -286,6 +233,10 @@ class Migrations extends Component
         } else {
             false;
         }
+    }
+
+    public function getErrors(){
+        return $this->errors;
     }
 
 

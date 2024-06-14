@@ -96,7 +96,6 @@ class EntriesContent extends BaseContentMigration
         foreach($data['sites'] as $key => $value) {
             if ($primaryEntry) {
               $value['id'] = $primaryEntry->id;
-              $this->localizeData($primaryEntry, $value);
             } else {
               $siteEntry = Entry::find()
                 ->section($data['section'])
@@ -115,7 +114,6 @@ class EntriesContent extends BaseContentMigration
             $fields = array_key_exists('fields', $value) ? $value['fields'] : [];
             $this->validateImportValues($fields);
             $entry->setFieldValues($fields);
-
             $value['fields'] = $fields;
             $event = $this->onBeforeImport($entry, $value);
 
@@ -124,15 +122,15 @@ class EntriesContent extends BaseContentMigration
                 if ($result) {
                     $this->onAfterImport($event->element, $data);
                 } else {
-                    $this->addError('error', 'Could not save the ' . $data['slug'] . ' entry.');
+                    $this->addError('Could not save the ' . $data['slug'] . ' entry.');
                     foreach ($event->element->getErrors() as $error) {
-                        $this->addError('error', join(',', $error));
+                        $this->addError(join(',', $error));
                     }
                     return false;
                 }
             } else {
-                $this->addError('error', 'Error importing ' . $data['slug'] . ' field.');
-                $this->addError('error', $event->error);
+                $this->addError('Error importing ' . $data['slug'] . ' field.');
+                $this->addError($event->error);
                 return false;
             }
 

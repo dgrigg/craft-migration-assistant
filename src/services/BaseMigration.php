@@ -3,7 +3,7 @@
 namespace dgrigg\migrationassistant\services;
 
 use Craft;
-use craft\base\Component;
+use yii\base\Component;
 use dgrigg\migrationassistant\events\ExportEvent;
 use dgrigg\migrationassistant\events\ImportEvent;
 
@@ -44,7 +44,7 @@ abstract class BaseMigration extends Component implements IMigrationService
     /**
      * @var array
      */
-    //protected $errors = array();
+    protected $errors = array();
 
     /**
      * @var
@@ -139,7 +139,7 @@ abstract class BaseMigration extends Component implements IMigrationService
      */
     public function import(array $data)
     {
-        $this->clearErrors();
+        $this->resetErrors();
         $result = true;
 
         foreach ($data as $section) {
@@ -222,6 +222,30 @@ abstract class BaseMigration extends Component implements IMigrationService
         ));
 
         $this->trigger($this::EVENT_AFTER_IMPORT_ELEMENT, $event);
+    }
+
+    public function addError($error){
+        $this->errors[] = $error;
+    }
+
+    public function getError(){
+        if (!empty($this->errors)){
+            return $this->errors[0];
+        } else {
+            false;
+        }
+    }
+
+    public function getErrors(){
+        return $this->errors;
+    }
+
+    public function resetErrors(){
+        return $this->errors = [];
+    }
+
+    public function hasErrors(){
+        return !empty($this->errors);
     }
 
 

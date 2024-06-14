@@ -83,8 +83,12 @@ class MigrationsController extends Controller
                 
                 $this->setSuccessFlash(Craft::t('app', "Applied " . ($count === 0 ? 'all' : $count) . " migration{$suffix} successfully."));
             } else {
-                Craft::error($migrationSvc->getError(), __METHOD__);
+                
                 $this->setFailFlash(Craft::t('app', $migrationSvc->getError()));
+                $errors = $migrationSvc->getError();
+                foreach($errors as $error){
+                    Craft::error($error, __METHOD__);
+                }
             }
         } catch (Exception) {
             $this->setFailFlash(Craft::t('app', 'An error occurred while applying the migrations.'));

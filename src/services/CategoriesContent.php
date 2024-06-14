@@ -83,7 +83,6 @@ class CategoriesContent extends BaseContentMigration
         foreach($data['sites'] as $value) {
             if ($primaryCategory) {
                 $value['id'] = $primaryCategory->id;
-                $this->localizeData($primaryCategory, $value);
             }
 
             $category = $this->createModel($value);
@@ -102,13 +101,15 @@ class CategoriesContent extends BaseContentMigration
                 if ($result) {
                     $this->onAfterImport($event->element, $data);
                 } else {
-                    $this->addError('error', 'Could not save the ' . $data['slug'] . ' category.');
-                    $this->addError('error', join(',', $event->element->getErrors()));
+                    $this->addError('Could not save the ' . $data['slug'] . ' category.');
+                    foreach ($event->element->getErrors() as $error) {
+                        $this->addError(join(',', $error));
+                    }
                     return false;
                 }
             } else {
-                $this->addError('error', 'Error importing ' . $data['slug'] . ' category.');
-                $this->addError('error', $event->error);
+                $this->addError('Error importing ' . $data['slug'] . ' category.');
+                $this->addError($event->error);
                 return false;
             }
 

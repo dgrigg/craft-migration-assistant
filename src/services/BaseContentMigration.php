@@ -9,6 +9,7 @@ use Craft;
 use craft\fields\BaseOptionsField;
 use craft\fields\BaseRelationField;
 use craft\base\Element;
+use Throwable;
 
 abstract class BaseContentMigration extends BaseMigration
 {
@@ -93,22 +94,26 @@ abstract class BaseContentMigration extends BaseMigration
                 //need to make sure hex value goes a string
                 $value = (string)$value;
                 break;
-            case 'typedlinkfield\fields\LinkField':
-                $elementTypes = ['asset','category','entry','user'];
+            case 'lenz\linkfield\fields\LinkField':
+                //convert value to a stdclass 
+                $linkType = $value->type;                
+                $value = (object)(array) $value;
+                $value->type = $linkType;
+                $value->elementType = 'lenz\\linkfield\\fields\\LinkField';
+                               
+                if (isset($value->linkedId) && !is_null($value->linkedId)) {
+                    $element = Craft::$app->elements->getElementById($value->linkedId);
+                      $value->element = [$this->getSourceHandle($element, $element::class)];
+                } 
 
-                if (in_array($value->type, $elementTypes)){
-                    $elementType = 'craft\\elements\\' . ucfirst($value->type);
-                    if ($value->value != null){
-                      $element = Craft::$app->elements->getElementById($value->value, $elementType);
-                      $value->value = [$this->getSourceHandle($element, $elementType)];
-                    }
-                } elseif ($value->type == 'site'){
-                    $site = Craft::$app->sites->getSiteById($value->value);
-                    $value->value = $site->handle;
+                if (isset($value->linkedSiteId) && !is_null($value->linkedSiteId)) {
+                    $site = Craft::$app->sites->getSiteById($value->linkedSiteId);
+                    $value->site = $site->handle;
                 }
-                //convert the field object to an array so we can add a property
-                $value = json_decode(json_encode($value), true);
-                $value['elementType'] = 'typedlinkfield\\fields\\LinkField';
+
+                unset($value->linkedId);
+                unset($value->linkedSiteId);
+
                 break;
             default:
                 if ($field instanceof BaseRelationField) {
@@ -413,7 +418,6 @@ abstract class BaseContentMigration extends BaseMigration
             if (is_array($element) && key_exists('elementType', $element)) {
                 $elementType = str_replace('/', '\\', $element['elementType']);
                 $func = null;
-
                 switch ($elementType) {
                     case 'craft\elements\Asset':
                          $func = 'dgrigg\migrationassistant\helpers\MigrationManagerHelper::getAssetByHandle';
@@ -422,6 +426,7 @@ abstract class BaseContentMigration extends BaseMigration
                         $func = 'dgrigg\migrationassistant\helpers\MigrationManagerHelper::getCategoryByHandle';
                         break;
                     case 'craft\elements\Entry':
+                        
                         $func = 'dgrigg\migrationassistant\helpers\MigrationManagerHelper::getEntryByHandle';
                         break;
                     case 'craft\elements\Tag':
@@ -430,7 +435,7 @@ abstract class BaseContentMigration extends BaseMigration
                     case 'craft\elements\User':
                         $func = 'dgrigg\migrationassistant\helpers\MigrationManagerHelper::getUserByHandle';
                         break;
-                    case 'typedlinkfield\fields\LinkField':
+                    case 'lenz\linkfield\fields\LinkField':
                         $element = $this->populateLinkField($element);
                         $isElementField = false;
                         break;
@@ -460,74 +465,33 @@ abstract class BaseContentMigration extends BaseMigration
 
     /**
      * Get element linked in Link field
-     * @param
+     * @param $element LinkField data
      * @return
      */
-     /**
-     * @param $fieldValue
-     * @param $field
-     */
+    
 
    public function populateLinkField($element)
    {
-       $elementTypes = ['asset','category','entry','user'];
-        if (in_array($element['type'], $elementTypes)){
-            $value = $element['value'];
-            if ($value != null) {
-              $this->populateIds($value);
-              if (count($value) > 0){
-                  $element['value'] = $value[0];
-              }
-            } else {
-              $value = null;
+    if (isset($element['element'])){
+        $value = $element['element'];
+        if ($this->populateIds($value)) {
+            if (count($value) > 0){
+                $element['linkedId'] = $value[0];
+                $element['type'] = 'entry';
             }
-        } elseif ($element['type'] == 'site'){
-            $site = Craft::$app->sites->getSiteByHandle($element['value']);
-            if ($site){
-                $element['value'] = $site->id;
-            }
+            unset($element['element']);
         }
-        return $element;
-   }
-
-    /**
-     * Look for matrix/supertables/neo that are not localized and update the keys to
-     * ensure the site/locale values on child elements remain intact
-     * @param BaseElementModel $element
-     * @param array $data function foo($method)
-    **/
-    protected function localizeData(Element $element, Array &$data)
-    {
-        Craft::error('localizeData not needed', __METHOD__);
-        return;
-
-      //
-      if (MigrationManagerHelper::isVersion('3.2.0')) {
-        //localization not needed since 3.2.0
-        return;
-      }
-
-      $fieldLayout = $element->getFieldLayout();
-      foreach ($fieldLayout->getTabs() as $tab) {
-          foreach ($tab->getFields() as $tabField) {
-              $field = Craft::$app->fields->getFieldById($tabField->id);
-              $fieldValue = $element[$field->handle];
-              if (in_array ($field->className() , ['craft\fields\Matrix','verbb\supertable\fields\SuperTableField', 'benf\neo\Field']) ) {
-                if ($field->localizeBlocks == false) {
-                  $items = $fieldValue->getIterator();
-                  $i = 1;
-                  foreach ($items as $item) {
-
-                    if (key_exists('new'. $i, $data['fields'][$field->handle])) {
-                      $data['fields'][$field->handle][$item->id] = $data['fields'][$field->handle]['new' . $i];
-                      unset($data['fields'][$field->handle]['new' . $i]);
-                    }
-                    $i++;
-                  }
-                }
-              }
-          }
+    } 
+    
+    if (isset($element['site'])){
+        $site = Craft::$app->sites->getSiteByHandle($element['site']);
+        if ($site){
+            $element['linkedSiteId'] = $site->id;
+            
         }
+        unset($element['site']);
     }
-
+    unset($element->elementType);
+    return $element;    
+   }
 }

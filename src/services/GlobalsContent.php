@@ -66,13 +66,15 @@ class GlobalsContent extends BaseContentMigration
                 if ($result) {
                     $this->onAfterImport($event->element, $data);
                 } else {
-                    $this->addError('error', 'Could not save the ' . $data['handle'] . ' global.');
-                    $this->addError('error', join(',', $event->element->getErrors()));
+                    $this->addError('Could not save the ' . $data['handle'] . ' global.');
+                    foreach ($event->element->getErrors() as $error) {
+                        $this->addError(join(',', $error));
+                    }
                     return false;
                 }
             } else {
-                $this->addError('error', 'Error importing ' . $data['handle'] . ' global.');
-                $this->addError('error', $event->error);
+                $this->addError('Error importing ' . $data['handle'] . ' global.');
+                $this->addError($event->error);
                 return false;
             }
         }
