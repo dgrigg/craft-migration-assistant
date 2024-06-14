@@ -4,13 +4,8 @@ namespace dgrigg\migrationassistant\services;
 
 use Craft;
 use craft\base\Component;
-use craft\base\Element;
-use craft\models\FieldLayout;
-use craft\models\FieldLayoutTab;
-use craft\services\Fields;
 use dgrigg\migrationassistant\events\ExportEvent;
 use dgrigg\migrationassistant\events\ImportEvent;
-use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
 
 /**
  * Class MigrationManager_BaseMigrationService
@@ -170,109 +165,6 @@ abstract class BaseMigration extends Component implements IMigrationService
      * @return mixed
      */
     abstract public function importItem(array $data);
-
-    /**
-     * Create field layout array for export
-     *
-     * @param FieldLayout $fieldLayout Field layout to get info from
-     * @param array $newElement array to store field layout for migration
-     *
-     * @return Boolean
-     */
-    public function getFieldLayout($fieldLayout, array &$newElement)
-    {
-
-      if (MigrationManagerHelper::isVersion('3.5')) {
-        $newElement['fieldLayouts'] = array();
-        $newElement['fieldLayouts']['tabs'] = array();
-        foreach ($fieldLayout->getTabs() as $tab) {
-          $tabConfig = $tab->getConfig();
-          foreach($tabConfig['elements'] as &$tabElement) {
-            if ($tabElement['type'] == 'craft\\fieldlayoutelements\\CustomField') {
-              $field = Craft::$app->fields->getFieldByUid($tabElement['fieldUid']);
-              $tabElement['fieldHandle'] = $field->handle;
-              unset($tabElement['fieldUid']);
-            }
-          }
-          $newElement['fieldLayouts']['tabs'][] = $tabConfig;
-        }
-      } else {
-        $newElement['fieldLayout'] = array();
-        foreach ($fieldLayout->getTabs() as $tab) {
-          $newElement['fieldLayout'][$tab->name] = array();
-          foreach ($tab->getFields() as $tabField) {
-            $newElement['fieldLayout'][$tab->name][] = $tabField->handle;
-            if ($tabField->required) {
-              $newElement['requiredFields'][] = $tabField->handle;
-            }
-          }
-        }
-      }
-
-      return true;
-
-    }
-
-    /**
-     * Create FieldLayout for import
-     * @param array $data data to pull layout info from
-     * @return FieldLayout
-     */
-
-    public function createFieldLayout($data)
-    {
-
-      if (!array_key_exists('fieldLayout', $data) && !array_key_exists('fieldLayouts', $data)){
-        return false;
-      }
-
-      $requiredFields = array();
-      if (array_key_exists('requiredFields', $data)) {
-        foreach ($data['requiredFields'] as $handle) {
-          $field = Craft::$app->fields->getFieldByHandle($handle);
-          if ($field) {
-            $requiredFields[] = $field->id;
-          }
-        }
-      }
-
-      if (MigrationManagerHelper::isVersion('3.5')){
-        $fieldLayout = new FieldLayout();
-        foreach ($data['fieldLayouts']['tabs'] as &$tab) {
-          foreach ($tab['elements'] as $key => &$tabElement) {
-            if ($tabElement['type'] == 'craft\\fieldlayoutelements\\CustomField') {
-              $existingField = Craft::$app->fields->getFieldByHandle($tabElement['fieldHandle']);
-              if ($existingField) {
-                $tabElement['fieldUid'] = $existingField->uid;
-              } else {
-                //remove the field from the layout since it doesn't exist yet
-                unset($tab['elements'][$key]);
-              }
-              unset($tabElement['fieldHandle']);
-
-            }
-          }
-        }
-        $fieldLayout->setTabs($data['fieldLayouts']['tabs']);
-
-      } else {
-        $layout = [];
-        foreach ($data['fieldLayout'] as $key => $fields) {
-            $fieldIds = array();
-            foreach ($fields as $field) {
-                $existingField = Craft::$app->fields->getFieldByHandle($field);
-                if ($existingField) {
-                    $fieldIds[] = $existingField->id;
-                }
-            }
-            $layout[$key] = $fieldIds;
-        }
-
-        $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
-      }
-
-      return $fieldLayout;
-    }
 
     /**
      * Fires an 'onBeforeExport' event.

@@ -4,7 +4,6 @@ namespace dgrigg\migrationassistant\services;
 
 use Craft;
 use craft\elements\Category;
-use craft\helpers\DateTimeHelper;
 
 class CategoriesContent extends BaseContentMigration
 {
@@ -35,26 +34,29 @@ class CategoriesContent extends BaseContentMigration
 
         foreach($sites as $siteSetting){
             $site = Craft::$app->sites->getSiteById($siteSetting->siteId);
-            $category = Craft::$app->categories->getCategoryById($id, $site->id);
-            $categoryContent = array(
-                'slug' => $category->slug,
-                'category' => $category->getGroup()->handle,
-                'enabled' => $category->enabled,
-                'site' => $site->handle,
-                'enabledForSite' => $category->enabledForSite,
-                'title' => $category->title,
-                'uid' => $category->uid
-            );
+            
+            if ($site){
+                $category = Craft::$app->categories->getCategoryById($id, $site->id);
+                $categoryContent = array(
+                    'slug' => $category->slug,
+                    'category' => $category->getGroup()->handle,
+                    'enabled' => $category->enabled,
+                    'site' => $site->handle,
+                    'enabledForSite' => $category->enabledForSite,
+                    'title' => $category->title,
+                    'uid' => $category->uid
+                );
 
-            if ($category->getParent())
-            {
-                $categoryContent['parent'] = $category->getParent()->slug;
+                if ($category->getParent())
+                {
+                    $categoryContent['parent'] = $category->getParent()->slug;
+                }
+
+                $this->getContent($categoryContent, $category);
+
+                $categoryContent = $this->onBeforeExport($category, $categoryContent);
+                $content['sites'][$site->handle] = $categoryContent;
             }
-
-            $this->getContent($categoryContent, $category);
-
-            $categoryContent = $this->onBeforeExport($category, $categoryContent);
-            $content['sites'][$site->handle] = $categoryContent;
 
         }
 
@@ -71,7 +73,7 @@ class CategoriesContent extends BaseContentMigration
         $primaryCategory = Category::find()
             ->group($data['category'])
             ->slug($data['slug'])
-            ->first();
+            ->one();
 
         if (array_key_exists('parent', $data))
         {
@@ -145,7 +147,7 @@ class CategoriesContent extends BaseContentMigration
             $parent =Category::find()
                 ->group($data['category'])
                 ->slug($data['parent'])
-                ->first();
+                ->one();
             if ($parent) {
                 $category->newParentId = $parent->id;
             }

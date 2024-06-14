@@ -18,11 +18,6 @@ class CpAssetBundle extends AssetBundle
 
         // define the relative path to CSS/JS files that should be registered with the page
         // when this asset bundle is registered
-        $this->js = [
-            'js/MigrationManagerExport.js',
-            'js/MigrationManagerRunner.js'
-        ];
-
         $this->css = [
             'css/migration-manager.css',
         ];

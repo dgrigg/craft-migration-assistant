@@ -229,7 +229,7 @@ class MigrationManagerHelper
                 }
 
                 if ($element != null) {
-                    $permission = $permissionParts[0].':'. (MigrationManagerHelper::isVersion('3.1')  ? $element->uid : $element->id);
+                    $permission = $permissionParts[0] . ':' . $element->uid;
                 }
             }
         }
@@ -276,7 +276,7 @@ class MigrationManagerHelper
      * check to see if current version is greater than or equal to a version
      */
     public static function isVersion($version){
-        $currentVersion = Craft::$app->getVersion();
+        $currentVersion = Craft::$app->getVersion();        
         $version = explode('.', $version);
         $currentVersion = explode('.', $currentVersion);
         $isVersion = true;
@@ -285,6 +285,8 @@ class MigrationManagerHelper
                 $isVersion = false;
             }
         }
+
+        
         return $isVersion;
     }
 
@@ -401,10 +403,6 @@ class MigrationManagerHelper
             //Scandinavian
             'Å' => 'A', 'å' => 'a', 'Ä' => 'A', 'ä' => 'a', 'Æ' => 'AE', 'æ' => 'ae', 'Ä' => 'A', 'ä' => 'a',
             'Ö' => 'O', 'ö' => 'o', 'O' => 'A', 'ø' => 'o',
-
-
-
-
         );
 
         // Make custom replacements

@@ -1,125 +1,85 @@
+{% extends 'migrationassistant/_layouts/cp' %}
 
-{% extends "_layouts/cp" %}
-{% import "_includes/forms" as forms %}
-
-{# The title of this CP section #}
-{% set title = "Create Migration" %}
-
+{% set title = 'Migrations'|t %}
+{% set selectedSubnavItem = 'migrations' %}
 
 {% set crumbs = [
-{ label: 'Migration Assistant', url: url('migrationassistant') },
-{ label: 'Create Migration'|t, url: url('migrationassistant/create') }
+    { label: 'Migration Assistant', url: url('migrationassistant') }
 ] %}
 
 {% set tabs = {} %}
 
-{# Supported types #}
-{% set fields = craft.app.fields.getAllFields() -%}
-{% if fields is not empty %}
-    {% set tabs = tabs | merge({ fields: { label: 'Fields'|t, url: '#fields' } }) %}
-{% endif %}
+{% set tabs = tabs | merge( { pending: {label: 'Pending'|t, url: '#pending'  }}) %}
+{% set tabs = tabs | merge({ applied: {label: 'Applied'|t, url: '#applied' }}) %}
 
-{% set sections = craft.app.sections.getAllSections() -%}
-{% if sections is not empty %}
-    {% set tabs = tabs | merge({ sections: { label: 'Sections'|t, url: '#sections' } }) %}
-{% endif %}
+{% block content %}
 
-{% set categories = craft.app.categories.allGroups() -%}
-{% if categories is not empty %}
-    {% set tabs = tabs | merge({ categories: { label: 'Categories'|t, url: '#categories' } }) %}
-{% endif %}
+    <div id="pending">
 
-{% set globals = craft.app.globals.allSets() -%}
-{% if globals is not empty %}
-    {% set tabs = tabs | merge({ globals: { label: 'Globals'|t, url: '#globals' } }) %}
-{% endif %}
+    {% if pending | length > 0%}
+        <p>
+            {{ 'Select the migration(s) you want to run.'|t }}
+        </p>
 
-{% set tags = craft.app.getTags().getAllTagGroups() -%}
-{% if tags is not empty %}
-    {% set tabs = tabs | merge({ tags: { label: 'Tags'|t, url: '#tags' } }) %}
-{% endif %}
+        <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
+            <input type="hidden" name="action" value="migrationassistant/migrations/run">
+            {{ csrfInput() }}
 
-{% set sites = craft.app.sites.getAllSites() -%}
-{% if sites is not empty %}
-    {% set tabs = tabs | merge({ sites: { label: 'Sites'|t, url: '#sites' } }) %}
-{% endif %}
-
-{% set assetVolumes = craft.app.getVolumes().getAllVolumes() -%}
-{% if assetVolumes is not empty %}
-    {% set tabs = tabs | merge({ assetVolumes: { label: 'Asset Volumes'|t, url: '#assetVolumes' } }) %}
-{% endif %}
-
-{% set imageTransforms = craft.app.getAssetTransforms().getAllTransforms() -%}
-{% if imageTransforms is not empty %}
-    {% set tabs = tabs | merge({ imageTransforms: { label: 'Image Transforms'|t, url: '#imageTransforms' } }) %}
-{% endif %}
+            {% for migration in pending %}
+                <input type="checkbox" id="{{ migration }}" class="checkbox" name="migration[]" value="{{ migration }}">
+                <label for="{{ migration }}">{{ migration }}</label>
+                {% if not loop.last %}<hr>{% endif %}
+            {% endfor %}
 
 
-{% if CraftEdition > CraftSolo %}
-    {% set userGroups = craft.app.userGroups.allGroups()  -%}
-    {% if userGroups is not empty %}
-        {% set tabs = tabs | merge({ userGroups: { label: 'User Groups'|t, url: '#userGroups' } }) %}
-    {% endif %}
-{% endif %}
 
-{% if craft.migrationassistant.isVersion('3.1') == false %}
-    {% set other = { label: 'Other Settings'|t, url: '#other' } %}  
-    {% set tabs = tabs | merge({ other: other }) %}
-{% endif %}
+            <div class="buttons clearafter">
+                <button class="btn submit export-btn" name="submit" value="create">
+                    {{ 'Run migrations'|t }}
+                </button>
+            </div>
 
-{# The content of the CP Section#}
+            <div class="warning">
+                {{ 'If you don\'t make a selection, all migrations will be run.'|t }}
+            </div>
+        </form>
+    {%  else %}
+        <p>{{ 'There are no pending migrations'|t }}</p>
+    {%  endif %}
 
-{% set content %}
-    <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
-        <input type="hidden" name="action" value="migrationassistant/migrations/create-migration">
-        {{ csrfInput() }}
+    </div>
 
-        {% set firstRendered = false %}
-        {% for tabHandle, tab in tabs %}
-            {% if attribute(_context, tabHandle) is not empty %}
-                <div id="{{ tabHandle }}"{% if firstRendered %} class="hidden"{% endif %}>
-                    {% include 'migrationassistant/types/' ~ tabHandle %}
+    <div id="applied" class="hidden">
+        {% if applied | length > 0%}
+            <p>
+                {{ 'Select the migration(s) you want to run again.'|t }}
+            </p>
+
+            <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
+                <input type="hidden" name="action" value="migrationassistant/migrations/run">
+                <input type="hidden" name="rerun" value="1">
+                {{ csrfInput() }}
+
+
+                {% for migrationName, migration in applied %}
+                    <input type="checkbox" id="{{ migrationName }}" class="checkbox" name="migration[]" value="{{ migrationName }}">
+                    <label for="{{ migrationName}}">{{ migrationName }}</label>
+                    {% if not loop.last %}<hr>{% endif %}
+                {% endfor %}
+
+                <div class="buttons clearafter">
+                    <button class="btn submit export-btn" name="submit" value="create">
+                        {{ 'Reapply migrations'|t }}
+                    </button>
                 </div>
-                {% set firstRendered = true %}
-            {% endif %}
-        {% endfor %}
-
-        <div class="field " id="title-field">
-            <div class="heading">
-                <label id="title-label" for="title">Migration Name</label>
-                <div class="instructions"><p><span class="locale">* Optional</span> enter a migration name instead of using the auto generated name. Alphanumeric and dashes only.</p>
-                </div>
-            </div>
-            <div class="input ltr">
-                <input class="text fullwidth" style="max-width:600px;" type="text" id="migrationName" name="migrationName" value="" maxlength="255" autocomplete="off" placeholder="migration name"  pattern="[A-Za-z0-9_\-]+">
-            </div>
-
-        </div>
-
-        <div class="field">
-            <div class="heading">
-            <div class="instructions">
-            <span class="info"></span>
-            {{ 'To create an empty migration for custom purposes (ie deleting a field) click "Create Migration" without selecting anything to export.'|t }}
-            </div>
-            </div>
-        </div>
 
 
-        <div class="buttons clearafter">
-
-
-            <button class="btn submit export-btn" name="submit" value="create">
-                {{ 'Create Migration'|t }}
-            </button>
-        </div>
-
-        <div class="instructions">
-                    </div>
-    </form>
-{% endset %}
+            </form>
+        {%  else %}
+            <p>{{ 'There are no applied migrations'|t }}</p>
+        {%  endif %}
+    </div>
+{% endblock %}
 
 {% do view.registerAssetBundle("dgrigg\\migrationassistant\\assetbundles\\cp\\CpAssetBundle") %}
-{% js %}
-new Craft.MigrationManagerExport();
-{% endjs %}
+

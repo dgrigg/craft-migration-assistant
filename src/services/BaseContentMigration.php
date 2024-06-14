@@ -12,13 +12,12 @@ use craft\base\Element;
 
 abstract class BaseContentMigration extends BaseMigration
 {
-
     /**
      * @param $content
      * @param $element
      */
     protected function getContent(&$content, $element){
-        foreach ($element->getFieldLayout()->getFields() as $fieldModel) {
+        foreach ($element->getFieldLayout()->getCustomFields() as $fieldModel) {
             $this->getFieldContent($content['fields'], $fieldModel, $element);
         }
     }
@@ -156,6 +155,14 @@ abstract class BaseContentMigration extends BaseMigration
         }
     }
 
+    /**
+     * Set field values for supported custom fields
+     * 
+     * @param $parent - parent element
+     * @param $fieldHandle - field handle
+     * @param $fieldValue - value in field
+     */
+
     protected function validateFieldValue($parent, $fieldHandle, &$fieldValue)
     {
         $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
@@ -179,17 +186,15 @@ abstract class BaseContentMigration extends BaseMigration
                      foreach($fieldValue as $key => &$neoBlock){
                          $blockType = MigrationManagerHelper::getNeoBlockType($neoBlock['type'], $field->id);
                          if ($blockType) {
-                             $blockTabs = $blockType->getFieldLayout()->getTabs();
-                             foreach($blockTabs as $blockTab){
-                                 $blockFields = $blockTab->getFields();
-                                 foreach($blockFields as &$blockTabField){
-                                     $neoBlockField = Craft::$app->fields->getFieldById($blockTabField->fieldId ?? $blockTabField->id);
-                                     if ($neoBlockField->className() == 'verbb\supertable\fields\SuperTableField') {
-                                         $neoBlockFieldValue = $neoBlock['fields'][$neoBlockField->handle];
-                                         $this->updateSupertableFieldValue($neoBlockFieldValue, $neoBlockField);
-                                     }
-                                 }
-                             }
+                            $blockFields = $blockType->getFieldLayout()->getCustomFields();
+                            foreach($blockFields as &$blockTabField){
+                                $neoBlockField = Craft::$app->fields->getFieldById($blockTabField->fieldId ?? $blockTabField->id);
+                                if ($neoBlockField->className() == 'verbb\supertable\fields\SuperTableField') {
+                                    $neoBlockFieldValue = $neoBlock['fields'][$neoBlockField->handle];
+                                    $this->updateSupertableFieldValue($neoBlockFieldValue, $neoBlockField);
+                                }
+                            }
+                           
                          }
                      }
                      break;
@@ -250,7 +255,7 @@ abstract class BaseContentMigration extends BaseMigration
 
         foreach ($items as $item) {
             $itemType = $item->getType();
-            $itemFields = $itemType->getFieldLayout()->getFields();
+            $itemFields = $itemType->getFieldLayout()->getCustomFields();
             $itemValue = $settingsFunc($item);
             $fields = [];
 
@@ -493,6 +498,8 @@ abstract class BaseContentMigration extends BaseMigration
     **/
     protected function localizeData(Element $element, Array &$data)
     {
+        Craft::error('localizeData not needed', __METHOD__);
+        return;
 
       //
       if (MigrationManagerHelper::isVersion('3.2.0')) {
@@ -521,8 +528,6 @@ abstract class BaseContentMigration extends BaseMigration
               }
           }
         }
-
-
     }
 
 }

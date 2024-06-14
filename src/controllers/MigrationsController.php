@@ -6,8 +6,7 @@ use Craft;
 use craft\web\Controller;
 use craft\elements\GlobalSet;
 use dgrigg\migrationassistant\MigrationAssistant;
-use craft\web\assets\updates\UpdatesAsset;
-
+use Exception;
 
 /**
  * Class MigrationManagerController
@@ -25,7 +24,7 @@ class MigrationsController extends Controller
         $request = Craft::$app->getRequest();
         $post = $request->post();
 
-        if (MigrationAssistant::getInstance()->migrations->createSettingMigration($post)) {
+        if (MigrationAssistant::getInstance()->migrations->createContentMigration([])) {
             Craft::$app->getSession()->setNotice(Craft::t('migrationassistant', 'Migration created.'));
 
         } else {
@@ -57,38 +56,40 @@ class MigrationsController extends Controller
     /**
      * @throws HttpException
      */
-    public function actionStart()
+    public function actionRun()
     {
         $this->requirePostRequest();
-        $request = Craft::$app->getRequest();
-        $data = array(
-            'data' => array(
-                'migrations' =>  $request->getParam('migration', ''),
-                'applied' =>  $request->getParam('applied', 0),
-             ),
-            'nextAction' => 'migrationassistant/run/start'
-        );
+        $this->requirePermission('utility:migrations');
 
-        return $this->renderTemplate('migrationassistant/actions/run', $data);
-    }
+        try {
 
-    public function actionRerun(){
+            $request = Craft::$app->request;
+            $migrations = $request->getParam('migration', []);
+            $rerun = $request->getParam('rerun', 0);
+            if (!is_array($migrations)){
+                $migrations = [];
+            }           
 
-        $this->requirePostRequest();
-        $request = Craft::$app->getRequest();
+            if ($rerun == 1 && empty($migrations)) {
+                $this->setFailFlash(Craft::t('app', "You need to select an applied migration to reapply"));
+                return $this->redirect('migrationassistant');
+            }
+ 
+            $migrationSvc = MigrationAssistant::getInstance()->migrations;
 
-        if ($request->getParam('migration') == false){
-            Craft::$app->getSession()->setError(Craft::t('migrationassistant', 'You must select a migration to re run'));
-            return $this->redirectToPostedUrl();
-        } else {
-            $data = array(
-                'data' => array(
-                    'migrations' => $request->getParam('migration', ''),
-                    'applied' => $request->getParam('applied', 0),
-                ),
-                'nextAction' => $request->getParam('nextAction', 'migrationassistant/run/start')
-            );
-            return $this->renderTemplate('migrationassistant/actions/run', $data);
+            if ($migrationSvc->runMigrations($migrations)) {
+                $count = count($migrations);
+                $suffix = $count == 0 || $count > 1 ? 's' : '';              
+                
+                $this->setSuccessFlash(Craft::t('app', "Applied " . ($count === 0 ? 'all' : $count) . " migration{$suffix} successfully."));
+            } else {
+                Craft::error($migrationSvc->getError(), __METHOD__);
+                $this->setFailFlash(Craft::t('app', $migrationSvc->getError()));
+            }
+        } catch (Exception) {
+            $this->setFailFlash(Craft::t('app', 'An error occurred while applying the migrations.'));
         }
+
+        return $this->redirect('migrationassistant');
     }
 }

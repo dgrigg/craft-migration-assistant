@@ -44,27 +44,6 @@ interface IMigrationService
      */
     public function createModel(array $data);
 
-    /**
-     * @return array
-     */
-    //public function hasErrors();
-
-    /**
-     * @return array
-     */
-    //public function getErrors();
-
-    /**
-     * @param string $value
-     *
-     * @return void
-     */
-    //public function addError($attribute, $value);
-
-    /**
-     * @return void
-     */
-    //public function resetErrors();
 
     /**
      * @return string the post field to pull export ids from

@@ -3,7 +3,7 @@
 namespace dgrigg\migrationassistant\services;
 
 use Craft;
-use craft\base\Component;
+use yii\base\Component;
 use craft\helpers\App;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
@@ -14,30 +14,6 @@ use DateTime;
 
 class Migrations extends Component
 {
-    private $_migrationTable;
-
-    private $_settingsMigrationTypes = array(
-        'site' => 'sites',
-        'field' => 'fields',
-        'section' => 'sections',
-        'assetVolume' => 'assetVolumes',
-        'assetTransform' => 'assetTransforms',
-        'global' => 'globals',
-        'tag' => 'tags',
-        'category' => 'categories',
-        'route' => 'routes',
-        'userGroup' => 'userGroups',
-        'systemMessages' => 'systemMessages',
-    );
-
-    private $_settingsDependencyTypes = array(
-        'site' => 'sites',
-        'section' => 'sections',
-        'assetVolume' => 'assetVolumes',
-        'tag' => 'tags',
-        'category' => 'categories',
-    );
-
     private $_contentMigrationTypes = array(
         'entry' => 'entriesContent',
         'category' => 'categoriesContent',
@@ -45,85 +21,7 @@ class Migrations extends Component
         'global' => 'globalsContent',
     );
 
-
-    /**
-     * create a new migration file based on input element types
-     *
-     * @param $data
-     *
-     * @return bool
-     */
-    public function createSettingMigration($data)
-    {
-
-        $manifest = [];
-
-        $migration = array(
-            'settings' => array(
-                'dependencies' => array(),
-                'elements' => array(),
-            ),
-        );
-
-        $empty = true;
-
-        //build a list of dependencies first to avoid potential cases where items are requested by fields before being created
-        //export them without additional fields to prevent conflicts with missing fields, field tabs can be added on the second pass
-        //after all the fields have been created
-        $plugin = MigrationAssistant::getInstance();
-
-        foreach ($this->_settingsDependencyTypes as $key => $value) {
-            $service = $plugin->get($value);
-            if (array_key_exists($service->getSource(), $data)) {
-                $migration['settings']['dependencies'][$service->getDestination()] = $service->export($data[$service->getSource()], false);
-                $empty = false;
-
-                if ($service->hasErrors()) {
-                    $errors = $service->getErrors();
-                    foreach ($errors as $error) {
-                        Craft::error($error, __METHOD__);
-                        $this->addError('error', $error);
-                    }
-
-                    return false;
-                }
-            }
-        }
-
-        foreach ($this->_settingsMigrationTypes as $key => $value) {
-            $service = $plugin->get($value);
-            if (array_key_exists($service->getSource(), $data)) {
-                $migration['settings']['elements'][$service->getDestination()] = $service->export($data[$service->getSource()], true);
-                $empty = false;
-
-                if ($service->hasErrors()) {
-                    $errors = $service->getErrors();
-                    foreach ($errors as $error) {
-                        Craft::error($error, __METHOD__);
-                        $this->addError('error', $error);
-                    }
-
-                    return false;
-                }
-                $manifest = array_merge($manifest, [$key => $service->getManifest()]);
-            }
-        }
-
-        if ($empty) {
-            $migration = null;
-        }
-
-        if (array_key_exists('migrationName', $data)){
-            $migrationName = trim($data['migrationName']);
-            $migrationName = str_replace(' ', '_', $migrationName);
-        } else {
-            $migrationName = '';
-        }
-
-        $this->createMigration($migration, $manifest, $migrationName);
-
-        return true;
-    }
+    private $errors = [];
 
     /**
      * create a new migration file based on selected content elements
@@ -219,9 +117,6 @@ class Migrations extends Component
         }
 
         $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        //escape backslashes
-        //$migration = str_replace('\\', '\\\\', $migration);
-
         $content = Craft::$app->view->renderTemplate('migrationassistant/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
 
         FileHelper::writeToFile($path, $content);
@@ -233,54 +128,22 @@ class Migrations extends Component
     }
 
     /**
-     * {@inheritdoc}
+     * Import data from migration file
+     * 
+     * @param $daata - json data
      */
     public function import($data)
     {
         $data = iconv('UTF-8', 'UTF-8//IGNORE', StringHelper::convertToUtf8($data));
         $data = json_decode($data, true);
         if (json_last_error() != JSON_ERROR_NONE){
-            Craft::error('Migration Manager JSON error', __METHOD__);
+            Craft::error('Migration Assistant JSON error', __METHOD__);
             Craft::error(json_last_error(), __METHOD__);
             Craft::error(json_last_error_msg(), __METHOD__);
         }
 
         $plugin = MigrationAssistant::getInstance();
-        if (array_key_exists('settings', $data)) {
-            // run through dependencies first to create any elements that need to be in place for fields, field layouts and other dependencies
-            foreach ($this->_settingsDependencyTypes as $key => $value) {
-                $service = $plugin->get($value);
-                if (array_key_exists($service->getDestination(), $data['settings']['dependencies'])) {
-
-                    $service->import($data['settings']['dependencies'][$service->getDestination()]);
-                    if ($service->hasErrors()) {
-                        $errors = $service->getErrors();
-                        foreach ($errors as $error) {
-                            Craft::error($error , __METHOD__);
-                            $this->addError('error', $error);
-                        }
-                        return false;
-                    }
-                }
-            }
-
-            foreach ($this->_settingsMigrationTypes as $key => $value) {
-                $service = $plugin->get($value);
-                if (array_key_exists($service->getDestination(), $data['settings']['elements'])) {
-                    $service->import($data['settings']['elements'][$service->getDestination()]);
-                    if ($service->hasErrors()) {
-                        $errors = $service->getErrors();
-                        foreach ($errors as $error) {
-                            Craft::error($error, __METHOD__);
-                            $this->addError('error', $error);
-                        }
-                        return false;
-                    }
-                }
-            }
-        }
-
-        if (array_key_exists('content', $data)) {
+             if (array_key_exists('content', $data)) {
             foreach ($this->_contentMigrationTypes as $key => $value) {
                 $service = $plugin->get($value);
                 if (array_key_exists($service->getDestination(), $data['content'])) {
@@ -299,6 +162,57 @@ class Migrations extends Component
 
 
         return true;
+    }
+
+    /**
+     * Upgrades the application by applying new migrations.
+     *
+     * @param int $limit The number of new migrations to be applied. If 0, it means
+     * applying all available new migrations.
+     * @throws MigrationException on migrate failure
+     */
+    public function up(int $limit = 0): void
+    {
+        // This might take a while
+        App::maxPowerCaptain();
+
+        $migrationNames = $this->getNewMigrations();
+
+        if (empty($migrationNames)) {
+            Craft::info('No new migration found. Your system is up to date.', __METHOD__);
+            return;
+        }
+
+        $total = count($migrationNames);
+
+        if ($limit !== 0) {
+            $migrationNames = array_slice($migrationNames, 0, $limit);
+        }
+
+        $n = count($migrationNames);
+
+        if ($n === $total) {
+            $logMessage = "Total $n new " . ($n === 1 ? 'migration' : 'migrations') . ' to be applied:';
+        } else {
+            $logMessage = "Total $n out of $total new " . ($total === 1 ? 'migration' : 'migrations') . ' to be applied:';
+        }
+
+        foreach ($migrationNames as $migrationName) {
+            $logMessage .= "\n\t$migrationName";
+        }
+
+        Craft::info($logMessage, __METHOD__);
+
+        foreach ($migrationNames as $migrationName) {
+            try {
+                $this->migrateUp($migrationName);
+            } catch (MigrationException $e) {
+                Craft::error('Migration failed. The rest of the migrations are cancelled.', __METHOD__);
+                throw $e;
+            }
+        }
+
+        Craft::info('Migrated up successfully.', __METHOD__);
     }
 
     /**
@@ -335,8 +249,10 @@ class Migrations extends Component
                 $migrator->removeMigrationHistory($migrationName);
                 $migrator->migrateUp($migrationName);
             } catch (MigrationException $e) {
-                $this->addError('error', $e->getMessage());
-                Craft::error('Migration failed. The rest of the migrations are cancelled.', __METHOD__);
+                Craft::error('Migration failed.', __METHOD__);
+                Craft::error($e->getMessage(), __METHOD__);
+                Craft::error($e, __METHOD__);
+                $this->addError("Migration {$migrationName} failed. The migration process was cancelled. Check the migration logs for details.");
 
                 return false;
             }
@@ -358,6 +274,18 @@ class Migrations extends Component
         $migrator = Craft::$app->getContentMigrator();
         $newMigrations = $migrator->getNewMigrations();
         return $newMigrations;
+    }
+
+    public function addError($error){
+        $this->errors[] = $error;
+    }
+
+    public function getError(){
+        if (!empty($this->errors)){
+            return $this->errors[0];
+        } else {
+            false;
+        }
     }
 
 

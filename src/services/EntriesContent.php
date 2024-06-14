@@ -40,33 +40,35 @@ class EntriesContent extends BaseContentMigration
 
             foreach ($sites as $siteId) {
                 $site = Craft::$app->sites->getSiteById($siteId);
-                $entry = Craft::$app->entries->getEntryById($element->id, $siteId);
-                if ($entry) {
-                    $entryContent = array(
-                        'slug' => $entry->slug,
-                        'section' => $entry->getSection()->handle,
-                        'enabled' => $entry->enabled,
-                        'site' => $site->handle,
-                        'enabledForSite' => $entry->enabledForSite,
-                        'postDate' => $entry->postDate,
-                        'expiryDate' => $entry->expiryDate,
-                        'title' => $entry->title,
-                        'entryType' => $entry->type->handle,
-                        'uid' => $entry->uid
-                    );
+                if ($site){
+                    $entry = Craft::$app->entries->getEntryById($element->id, $siteId);
+                    if ($entry) {
+                        $entryContent = array(
+                            'slug' => $entry->slug,
+                            'section' => $entry->getSection()->handle,
+                            'enabled' => $entry->enabled,
+                            'site' => $site->handle,
+                            'enabledForSite' => $entry->enabledForSite,
+                            'postDate' => $entry->postDate,
+                            'expiryDate' => $entry->expiryDate,
+                            'title' => $entry->title,
+                            'entryType' => $entry->type->handle,
+                            'uid' => $entry->uid
+                        );
 
-                    if ($entry->author) {
-                        $entryContent['author'] = $entry->author->username;
+                        if ($entry->author) {
+                            $entryContent['author'] = $entry->author->username;
+                        }
+
+                        if ($entry->getParent()) {
+                            $entryContent['parent'] = $primaryEntry->getParent()->slug;
+                        }
+
+                        $this->getContent($entryContent, $entry);
+                        $entryContent = $this->onBeforeExport($entry, $entryContent);
+
+                        $content['sites'][$site->handle] = $entryContent;
                     }
-
-                    if ($entry->getParent()) {
-                        $entryContent['parent'] = $primaryEntry->getParent()->slug;
-                    }
-
-                    $this->getContent($entryContent, $entry);
-                    $entryContent = $this->onBeforeExport($entry, $entryContent);
-
-                    $content['sites'][$site->handle] = $entryContent;
                 }
             }
         }
@@ -162,16 +164,15 @@ class EntriesContent extends BaseContentMigration
         }
 
         $entry->slug = $data['slug'];
-        $entry->postDate = is_null($data['postDate']) ? '' : new DateTime($data['postDate']['date'], new DateTimeZone($data['postDate']['timezone']));
-        $entry->expiryDate = is_null($data['expiryDate']) ? '' : new DateTime($data['expiryDate']['date'], new DateTimeZone($data['expiryDate']['timezone']));
+        $entry->postDate = is_null($data['postDate']) ? null : new DateTime($data['postDate']['date'], new DateTimeZone($data['postDate']['timezone']));
+        $entry->expiryDate = is_null($data['expiryDate']) ? null : new DateTime($data['expiryDate']['date'], new DateTimeZone($data['expiryDate']['timezone']));
 
         $entry->enabled = $data['enabled'];
         $entry->enabledForSite = $data['enabledForSite'];
 
         $entry->siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
-        if (MigrationManagerHelper::isVersion('3.1') && array_key_exists('uid', $data)) {
-            $entry->uid = $data['uid'];
-        }
+        $entry->uid = $data['uid'];
+        
 
         if (array_key_exists('author', $data)){
             $author = Craft::$app->users->getUserByUsernameOrEmail($data['author']);

@@ -13,27 +13,41 @@ class CpController extends Controller
 {
 
     /**
-     * Index
-     */
-
-    public function actionIndex()
-    {
-        $outstanding = MigrationAssistant::getInstance()->getBadgeCount();
-        if ($outstanding){
-            Craft::$app->getSession()->setError(Craft::t('migrationassistant','There are pending migrations to run'));
-        }
-        return $this->renderTemplate('migrationassistant/index');
-    }
-
-    /**
      * Shows migrations
      */
-    public function actionMigrations()
+    public function actionIndex()
     {
         $migrator = Craft::$app->getContentMigrator();
         $pending = $migrator->getNewMigrations();
         $applied = $migrator->getMigrationHistory();
-        return $this->renderTemplate('migrationassistant/migrations', array('pending' => $pending, 'applied' => $applied));
+        return $this->renderTemplate('migrationassistant/index', array('pending' => $pending, 'applied' => $applied));
+    }
+
+    /**
+     * Index
+     */
+
+     public function actionCreate()
+     {
+         
+         return $this->renderTemplate('migrationassistant/create');
+     }
+
+     /**
+     * @throws HttpException
+     */
+    public function actionStart()
+    {
+        
+        $data = array(
+            'data' => array(
+                'migrations' =>  '',
+                'applied' =>  0,
+             ),
+            'nextAction' => 'migrationassistant/run/start'
+        );
+
+        return $this->renderTemplate('migrationassistant/actions/run', $data);
     }
 
 }
