@@ -27,12 +27,12 @@ The Migration Assistant can create content migrations for the following elements
   - globals
   - users
 
-To create a migration select the element(s) you wish to migrate and then click the gear and 'Create Migration' button at the bottom of the page.
+To create a migration select the element(s) you wish to migrate and then click the gear and 'Create Migration' button at the bottom of the page. For Global values, use the 'Create Migration' button on the globals screen.
 
 ![Migration Assistant](screenshots/entries-migration.png)
 ![Migration Assistant](screenshots/categories-migration.png)
 
-Content migrations are dependent on a workflow where you migrate related/dependent elements first. For example, if you have an entry that has some selected categories, the categories need exist on the destination site before the entry migration will work correctly. This means creating a migration of the category(ies) first. This holds true for users, assets other other entries. In the case of assets you will need to ensure the matching asset (based on asset source/folder/filename) exists on the destination site. For Global values, use the 'Create Migration' button on the global screen.
+Content migrations are dependent on a workflow where you migrate related/dependent elements first. For example, if you have an entry that has some selected categories, the categories need to exist on the destination site before the entry migration will work correctly. This means creating a migration of the category(ies) first. This holds true for users, assets other other related entries/elements. In the case of assets you will need to ensure the matching asset (based on asset source/folder/filename) exists on the destination site. 
 
 A migration file will be created in the `craft/migrations` folder. The migration filename will contain the slugs/handles of the migrated elements. Move the new migration file to your destination environment, ideally with version control.
 
@@ -50,11 +50,12 @@ git push
 git pull
 ```
 
-When new migration(s) are in your destination environment a badge will appear to let you know. Click on the 'Migrations' tab and run the new migrations. You can run all the pending migrations by simply clicking the Run Migrations button or you can select individual migrations to run. You can also run migrations from the native Craft/Utilities/Migrations tab (this only allows you to run all pending migrations, not individual ones).
+When new migration(s) are discovered in your destination environment a badge will appear to let you know. Click on the 'Migrations Assistant' tab and run the new migrations. You can run all the pending migrations by simply clicking the Run Migrations button or you can select individual migrations to run. You can also run migrations from the native Craft/Utilities/Migrations tab (this only allows you to run all pending migrations, not individual ones).
 
 ![Pending Migration](screenshots/migration-assistant-badge.png)
+![Pending Migration](screenshots/migration-assistant-migrations.png)
 
-Migration Assistant uses Craft's built in migrator to run migrations. Failed migrations will be rolled back and the database will be returned to it's pre migration state. You can check both the Craft logs to see details on why the migration failed. In many instances it's simply a case of a migration having dependencies (ie required fields) that have not been setup on the destination site or a missing plugin.
+Migration Assistant uses Craft's built in migrator to run migrations. Failed migrations will be rolled back and the database will be returned to it's pre migration state. You can check the Craft logs and the Migration logs to see details on why the migration failed. In many instances it's simply a case of a migration having dependencies (ie required fields) that have not been setup on the destination site or a missing field/plugin.
 
 You can also view previously applied migrations by clicking the 'Applied' tab on the migrationassistant/Migrations page. This will show you migrations that have already been applied and migrations that were created locally (and don't need to be run locally). Note that if you create [blank migrations](#custom-migrations) (by clicking the Create Migration button without selecting elements) they will show up in the New Migrations list, so that you have a chance to test and run them locally with your custom migration code.
 
@@ -88,9 +89,9 @@ In addition it also supports:
 
 ### Additional Field Support
 
-To support additional field types and special content you can use event handlers for customized import/export functions. There are two distinct types of export/import procedures you need to consider when adding custom support. Exporting/importing element settings and exporting/importing element content.
+To support additional field types and special content you can use event handlers for customized import/export functions. To handle export/import of custom field types your plugin/module should listen for the Export/Import events that are triggered from the `BaseContentMigration` class. Refer to the `src/helpers/LinkFieldHelper.php` to see how the export and import events can be used.
 
-To handle export/import of custom field types your plugin/module should listen for the Export/Import events that are triggered from elements that utilize fields. Following is the list of element types that the Migration Assistant has events for that allow you to modify the export/import data to support custom fields.
+Following is the list of element types that the Migration Assistant has events for that allow you to modify the export/import data to support custom fields.
 - Entries
 - Categories
 - Globals
@@ -98,34 +99,22 @@ To handle export/import of custom field types your plugin/module should listen f
 
 ### Using events
 
-During the export event you can modify the \$event->value data to include any additional settings not already in the data to be exported.
+During the export event you can modify the \$event->value data to include any additional settings not already in the data to be exported. This is also the right place to update references to linked elements swapping our element id's for handles/slugs that are portable across environments.
 
-/**
-     * @event ExportEvent The event that is triggered before an element is exported
-     */
-
+    @event ExportEvent - Triggered before an element is exported
     const EVENT_BEFORE_EXPORT_ELEMENT = 'beforeExport';
 
-   /**
-    * @event ExportEvent The event that is triggered before an element is exported
-    */
-
+    
+    @event ExportEvent - Triggered before an element field value is exported
     const EVENT_BEFORE_EXPORT_FIELD_VALUE = 'beforeExportFieldValue';
 
-    /**
-     * @event ImportEvent The event that is triggered before an element is imported, can be cancelled
-     */
+    @event ImportEvent - Triggered before an element is imported, can be cancelled
     const EVENT_BEFORE_IMPORT_ELEMENT = 'beforeImport';
 
-   /**
-    * @event ImportEvent The event that is triggered before an element is exported
-    */
+    @event ImportEvent - Triggered before an element field value is imported
+    const EVENT_BEFORE_IMPORT_FIELD_VALUE = 'beforeImportFieldValue';
 
-   const EVENT_BEFORE_IMPORT_FIELD_VALUE = 'beforeImportFieldValue';
-
-    /**
-     * @event ImportEvent The event that is triggered before an element is imported
-     */
+    @event ImportEvent - Triggered before an element is imported
     const EVENT_AFTER_IMPORT_ELEMENT = 'afterImport';
     
 
@@ -133,16 +122,14 @@ During the export event you can modify the \$event->value data to include any ad
 //Custom field example
 Event::on(Fields::class, Fields::EVENT_BEFORE_EXPORT_ELEMENT, function(ExportEvent $event) {
     $value = $event->value;
-    $value['typesettings']['special_setting'] = 'some special setting value';
+    $value['settings']['special_setting'] = 'some special setting value';
     $event->value = $value;
 });
 ```
 
 During the import you can modify the data before it is imported or deal with the element after it has been imported and either created or updated.
 
-Before import, the $event->element is the element model (based on handle match) to be imported (updated or created). The $event->value property is the raw data used to populate the element model. Change properties in the \$event->element to modify the element before it is saved.
-
-
+Before import, the $event->element is the element model (based on handle match) to be imported (updated or created). The $event->value property is the raw data used to populate the element model. You can change properties in the $event->element and $event->value to affect the imported data. Refer to the [LinkFieldHelper.php](src/helpers/LinkFieldHelper.php) for an example
 
 
 ```php
@@ -172,7 +159,7 @@ Event::on(Fields::class, Fields::EVENT_BEFORE_IMPORT_ELEMENT, function(ExportEve
 });
 ```
 
-Any values in the field data that contains id's should be converted to handles/slugs or some string based value that can be looked up on the destination site without depending on matching id values as id values can differ between website database instances.
+Any values in the field data that contains id's should be converted to handles/slugs or some string based value that can be looked up on the destination site without depending on matching id values as id values can differ between website database instances. Refer to the [ElementHelper:getSourceHandle](src/helpers/ElementHelper.php) and [ElementHelper:populateIds](src/helpers/ElementHelper.php) for more insight.
 
 For importing custom fields the imported value should match the fields required input structure. Check the field type's documentation and code for help on determining the correct structure.
 
@@ -195,13 +182,12 @@ To learn more about creating custom migrations:
 
 - [Craft CMS Official - Content Migrations](https://docs.craftcms.com/v3/content-migrations.html#creating-migrations)
 - [Craft CMS 3 Content Migration Examples](https://medium.com/mikethehud/craft-cms-3-content-migration-examples-3a377f6420c3)
+- [Adding Content with Content Migrations in Craft CMS](https://nystudio107.com/blog/adding-content-with-content-migrations-in-craft-cms)
 
 ## Upgrading from Migration Assistant 3 
 
-Migration Assistant 4 no longer includes migration support for fields, sections, settings, etc. Craft's core project config setup is a better mechanism for syncing Craft structure/settings across environments. 
+Migration Assistant 4 no longer includes migration support for fields, sections, settings, etc. Craft's core project config setup is a better mechanism for syncing Craft structure/settings across environments. Please note that migrations generated in Migration Assistant 3 will not work in Migration Assistant 4 due to changes in core Craft elements.
 
 #### Credits
-
-The entire dev team at [Firstborn](https://www.firstborn.com/)
 
 Flying Duck icon by Agne Alesiute from the [Noun Project](https://thenounproject.com/)

@@ -1,5 +1,9 @@
 # Migration Assistant Changelog
 
+## 4.0.0 - 2024-06-17
+
+- Craft 4 compatible release
+
 ## 3.2.7 - 2021-11-19
 
 - fixed field layout issue with Neo fields
