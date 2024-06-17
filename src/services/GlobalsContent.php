@@ -55,7 +55,6 @@ class GlobalsContent extends BaseContentMigration
             $site = Craft::$app->sites->getSiteByHandle($key);
             $set = Craft::$app->globals->getSetById($globalSet->id, $site->id);
 
-            $this->getSourceIds($value);
             $this->validateImportValues($value);
             $set->setFieldValues($value['fields']);
 

@@ -4,7 +4,7 @@ namespace dgrigg\migrationassistant\services;
 use Craft;
 use craft\elements\Entry;
 use craft\helpers\DateTimeHelper;
-use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
+use dgrigg\migrationassistant\helpers\MigrationHelper;
 use DateTime;
 use DateTimeZone;
 use Log;
@@ -110,7 +110,6 @@ class EntriesContent extends BaseContentMigration
             }
 
             $entry = $this->createModel($value);
-            $this->getSourceIds($value);
             $fields = array_key_exists('fields', $value) ? $value['fields'] : [];
             $this->validateImportValues($fields);
             $entry->setFieldValues($fields);

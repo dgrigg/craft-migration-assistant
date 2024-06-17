@@ -100,6 +100,35 @@ To handle export/import of custom field types your plugin/module should listen f
 
 During the export event you can modify the \$event->value data to include any additional settings not already in the data to be exported.
 
+/**
+     * @event ExportEvent The event that is triggered before an element is exported
+     */
+
+    const EVENT_BEFORE_EXPORT_ELEMENT = 'beforeExport';
+
+   /**
+    * @event ExportEvent The event that is triggered before an element is exported
+    */
+
+    const EVENT_BEFORE_EXPORT_FIELD_VALUE = 'beforeExportFieldValue';
+
+    /**
+     * @event ImportEvent The event that is triggered before an element is imported, can be cancelled
+     */
+    const EVENT_BEFORE_IMPORT_ELEMENT = 'beforeImport';
+
+   /**
+    * @event ImportEvent The event that is triggered before an element is exported
+    */
+
+   const EVENT_BEFORE_IMPORT_FIELD_VALUE = 'beforeImportFieldValue';
+
+    /**
+     * @event ImportEvent The event that is triggered before an element is imported
+     */
+    const EVENT_AFTER_IMPORT_ELEMENT = 'afterImport';
+    
+
 ```php
 //Custom field example
 Event::on(Fields::class, Fields::EVENT_BEFORE_EXPORT_ELEMENT, function(ExportEvent $event) {
@@ -112,6 +141,9 @@ Event::on(Fields::class, Fields::EVENT_BEFORE_EXPORT_ELEMENT, function(ExportEve
 During the import you can modify the data before it is imported or deal with the element after it has been imported and either created or updated.
 
 Before import, the $event->element is the element model (based on handle match) to be imported (updated or created). The $event->value property is the raw data used to populate the element model. Change properties in the \$event->element to modify the element before it is saved.
+
+
+
 
 ```php
 //Custom fields

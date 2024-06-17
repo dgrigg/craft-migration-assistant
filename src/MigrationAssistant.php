@@ -14,27 +14,24 @@ use craft\events\RegisterUserPermissionsEvent;
 use craft\services\UserPermissions;
 use craft\web\UrlManager;
 use craft\web\View;
-use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
+
 use dgrigg\migrationassistant\assetbundles\cpglobals\CpGlobalsAssetBundle;
 use dgrigg\migrationassistant\actions\MigrateCategoryElementAction;
 use dgrigg\migrationassistant\actions\MigrateEntryElementAction;
 use dgrigg\migrationassistant\actions\MigrateUserElementAction;
-use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
-use dgrigg\migrationassistant\variables\MigrationManagerVariable;
-
 use dgrigg\migrationassistant\helpers\FileLog;
-
+use dgrigg\migrationassistant\helpers\LinkFieldHelper;
 
 /**
  * Migration Assistant plugin for Craft CMS
  *
- * Create Craft migrations to easily migrate settings and content between website environments.
+ * Create Craft migrations to easily migrate content between website environments.
  *
  * @author    Derrick Grigg
  * @copyright Copyright (c) 2018 DGrigg Development Inc.
  * @link      https://dgrigg.com
- * @package   MigrationManager
+ * @package   MigrationAssistant
  * @since     1.0.0
  */
 
@@ -68,8 +65,6 @@ class MigrationAssistant extends Plugin
     * you do not need to load it in your init() method.
     *
     */
-
-
    public function init()
    {
       parent::init();
@@ -125,6 +120,8 @@ class MigrationAssistant extends Plugin
          }
       );
 
+      $this->registerFieldEvents();
+
       $request = Craft::$app->getRequest();
       if (!$request->getIsConsoleRequest() && $request->getSegment(1) == 'globals') {
          $view = Craft::$app->getView();
@@ -152,6 +149,11 @@ class MigrationAssistant extends Plugin
       FileLog::create('migration-assistant-errors', 'dgrigg\migrationassistant\*');
    }
 
+   protected function registerFieldEvents()
+   {
+      $linkFieldHelper = new LinkFieldHelper();
+   }
+
 
    private function hasPermissions(): bool
    {
@@ -161,7 +163,6 @@ class MigrationAssistant extends Plugin
    public function getCpNavItem(): ?array
    {
       $item = parent::getCpNavItem();
-      //$item['label'] = 'Migrations';
       $item['badgeCount'] = $this->getBadgeCount();
       $item['subnav'] = [
          'migrations' => ['label' => 'Migrations', 'url' => 'migrationassistant/index'],
@@ -172,7 +173,7 @@ class MigrationAssistant extends Plugin
 
    public function getBadgeCount()
    {
-      $count =  count($this->migrations->getNewMigrations());
+      $count = count($this->migrations->getNewMigrations());
       return $count;
    }
 }

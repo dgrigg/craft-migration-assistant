@@ -9,7 +9,7 @@ use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use craft\errors\MigrationException;
 use dgrigg\migrationassistant\MigrationAssistant;
-use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
+use dgrigg\migrationassistant\helpers\MigrationHelper;
 use DateTime;
 
 class Migrations extends Component
@@ -73,10 +73,11 @@ class Migrations extends Component
     /**
      * @param mixed $migration data to write in migration file
      * @param array $manifest
+     * @param string $migrationName 
      *
      * @throws Exception
      */
-    private function createMigration($migration, $manifest = array(), $migrationName = '')
+    public function createMigration($migration, $manifest = array(), $migrationName = '')
     {
         $empty = is_null($migration);
         $date = new DateTime();
@@ -97,7 +98,7 @@ class Migrations extends Component
 
         if (!$empty || count($description)>0) {
             $description = implode('_', $description);
-            $name .= '_' . MigrationManagerHelper::slugify($description);
+            $name .= '_' . MigrationHelper::slugify($description);
         }
 
         $filename = sprintf($name, $date->format('ymd_His'));
@@ -125,6 +126,8 @@ class Migrations extends Component
         if (!$empty) {
             $migrator->addMigrationHistory($filename);
         }
+
+        return true;
     }
 
     /**

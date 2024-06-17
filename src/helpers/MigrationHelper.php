@@ -15,7 +15,7 @@ use craft\records\TagGroup;
 /**
  * Class MigrationManagerHelper
  */
-class MigrationManagerHelper
+class MigrationHelper
 {
     /**
      * @param string            $handle
@@ -100,6 +100,14 @@ class MigrationManagerHelper
                 $query->volumeId($volume->id);
                 $query->folderId($folder->id);
                 $query->filename($element['filename']);
+
+                if (array_key_exists('site', $element)){
+                    $site = Craft::$app->sites->getSiteByHandle($element['site']);
+                    if ($site){
+                        $query->siteId($site->id);
+                    }
+                }
+
                 $asset = $query->one();
 
                 if ($asset) {
@@ -125,6 +133,14 @@ class MigrationManagerHelper
             $query = Category::find();
             $query->groupId($categoryGroup->id);
             $query->slug($element['slug']);
+
+            if (array_key_exists('site', $element)){
+                $site = Craft::$app->sites->getSiteByHandle($element['site']);
+                if ($site){
+                    $query->siteId($site->id);
+                }
+            }
+            
             $category = $query->one();
 
             if ($category) {
@@ -249,18 +265,17 @@ class MigrationManagerHelper
             if (preg_match('/(:\w)/', $permission)) {
                 $permissionParts = explode(":", $permission);
                 $element = null;
-                $hasUids = MigrationManagerHelper::isVersion('3.1');
 
                 if (preg_match('/entries|entrydrafts/', $permissionParts[0])) {
-                    $element = $hasUids ? Craft::$app->sections->getSectionByUid($permissionParts[1]) : Craft::$app->sections->getSectionById($permissionParts[1]);
+                    $element = Craft::$app->sections->getSectionByUid($permissionParts[1]);
                 } elseif (preg_match('/volume/', $permissionParts[0])) {
-                    $element = $hasUids ? Craft::$app->volumes->getVolumeByUid($permissionParts[1]) : Craft::$app->volumes->getVolumeById($permissionParts[1]);
+                    $element = Craft::$app->volumes->getVolumeByUid($permissionParts[1]);
                 } elseif (preg_match('/categories/', $permissionParts[0])) {
-                    $element = $hasUids ? Craft::$app->categories->getGroupByUid($permissionParts[1]) : Craft::$app->categories->getGroupById($permissionParts[1]);
+                    $element = Craft::$app->categories->getGroupByUid($permissionParts[1]);
                 } elseif (preg_match('/globalset/', $permissionParts[0])) {
-                    $element = $hasUids ? MigrationManagerHelper::getGlobalSetByUid($permissionParts[1]) : Craft::$app->globals->getSetByid($permissionParts[1]);
+                    $element = MigrationHelper::getGlobalSetByUid($permissionParts[1]);
                 } elseif (preg_match('/site/', $permissionParts[0])) {
-                    $element = $hasUids ? Craft::$app->sites->getSiteByUid($permissionParts[1]) : Craft::$app->sites->getSiteById($permissionParts[1]);
+                    $element = Craft::$app->sites->getSiteByUid($permissionParts[1]);
                 }
 
                 if ($element != null) {
@@ -270,24 +285,6 @@ class MigrationManagerHelper
         }
 
         return $permissions;
-    }
-
-    /**
-     * check to see if current version is greater than or equal to a version
-     */
-    public static function isVersion($version){
-        $currentVersion = Craft::$app->getVersion();        
-        $version = explode('.', $version);
-        $currentVersion = explode('.', $currentVersion);
-        $isVersion = true;
-        foreach($version as $key => $value){
-            if ((int)$currentVersion[$key] < $version[$key]){
-                $isVersion = false;
-            }
-        }
-
-        
-        return $isVersion;
     }
 
     /**

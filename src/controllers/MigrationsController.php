@@ -24,7 +24,7 @@ class MigrationsController extends Controller
         $request = Craft::$app->getRequest();
         $post = $request->post();
 
-        if (MigrationAssistant::getInstance()->migrations->createContentMigration([])) {
+        if (MigrationAssistant::getInstance()->migrations->createMigration(null, [], $post['migrationName'])) {
             Craft::$app->getSession()->setNotice(Craft::t('migrationassistant', 'Migration created.'));
 
         } else {
@@ -90,7 +90,8 @@ class MigrationsController extends Controller
                     Craft::error($error, __METHOD__);
                 }
             }
-        } catch (Exception) {
+        } catch (Exception $error) {
+            Craft::error($error, __METHOD__);
             $this->setFailFlash(Craft::t('app', 'An error occurred while applying the migrations.'));
         }
 

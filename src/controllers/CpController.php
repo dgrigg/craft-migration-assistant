@@ -29,25 +29,24 @@ class CpController extends Controller
 
      public function actionCreate()
      {
-         
-         return $this->renderTemplate('migrationassistant/create');
+        return $this->renderTemplate('migrationassistant/create');
      }
 
      /**
      * @throws HttpException
      */
-    public function actionStart()
-    {
+    // public function actionStart()
+    // {
         
-        $data = array(
-            'data' => array(
-                'migrations' =>  '',
-                'applied' =>  0,
-             ),
-            'nextAction' => 'migrationassistant/run/start'
-        );
+    //     $data = array(
+    //         'data' => array(
+    //             'migrations' =>  '',
+    //             'applied' =>  0,
+    //          ),
+    //         'nextAction' => 'migrationassistant/run/start'
+    //     );
 
-        return $this->renderTemplate('migrationassistant/actions/run', $data);
-    }
+    //     return $this->renderTemplate('migrationassistant/actions/run', $data);
+    // }
 
 }

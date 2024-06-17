@@ -4,7 +4,7 @@ namespace dgrigg\migrationassistant\services;
 
 use Craft;
 use craft\elements\User;
-use dgrigg\migrationassistant\helpers\MigrationManagerHelper;
+use dgrigg\migrationassistant\helpers\MigrationHelper;
 
 class UsersContent extends BaseContentMigration
 {
@@ -78,27 +78,23 @@ class UsersContent extends BaseContentMigration
             }
         }
 
-        $this->getSourceIds($data);
         $this->validateImportValues($data);
 
         if (array_key_exists('fields', $data)) {
             $user->setFieldValues($data['fields']);
         }
 
-        Craft::error('after user: ' . $user->email . ' data: '. $data['email'], __METHOD__);
-
         $event = $this->onBeforeImport($user, $data);
         if ($event->isValid) {
 
             // save user
             $result = Craft::$app->getElements()->saveElement($event->element);
-            Craft::error('save user result ' . $result, __METHOD__);
 
             if ($result) {
                 $groups = $this->getUserGroupIds($data['groups']);
                 Craft::$app->users->assignUserToGroups($user->id, $groups);
 
-                $permissions = MigrationManagerHelper::getPermissionIds($data['permissions']);
+                $permissions = MigrationHelper::getPermissionIds($data['permissions']);
                 Craft::$app->userPermissions->saveUserPermissions($user->id, $permissions);
 
                 $this->onAfterImport($event->element, $data);
@@ -186,7 +182,7 @@ class UsersContent extends BaseContentMigration
     private function getUserPermissionHandles(&$content, $element)
     {
         $permissions = Craft::$app->userPermissions->getPermissionsByUserId($element->id);
-        $permissions = MigrationManagerHelper::getPermissionHandles($permissions);
+        $permissions = MigrationHelper::getPermissionHandles($permissions);
         $content['permissions'] = $permissions;
     }
 }
