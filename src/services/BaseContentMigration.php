@@ -185,6 +185,7 @@ abstract class BaseContentMigration extends BaseMigration
                                         $this->updateSupertableFieldValue($neoBlockFieldValue, $neoBlockField);
                                     }
                                 }
+                                $this->validateImportValues($neoBlock['fields']);
                             }
                         }
                         break;

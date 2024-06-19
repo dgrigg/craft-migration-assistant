@@ -21,7 +21,7 @@ use dgrigg\migrationassistant\actions\MigrateCategoryElementAction;
 use dgrigg\migrationassistant\actions\MigrateEntryElementAction;
 use dgrigg\migrationassistant\actions\MigrateUserElementAction;
 use dgrigg\migrationassistant\helpers\FileLog;
-use dgrigg\migrationassistant\helpers\LinkFieldHelper;
+use dgrigg\migrationassistant\extensions\LinkFieldExtension;
 
 /**
  * Migration Assistant plugin for Craft CMS
@@ -151,7 +151,7 @@ class MigrationAssistant extends Plugin
 
    protected function registerFieldEvents()
    {
-      $linkFieldHelper = new LinkFieldHelper();
+      $linkFieldExtension = new LinkFieldExtension();
    }
 
 

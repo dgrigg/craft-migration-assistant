@@ -89,7 +89,7 @@ In addition it also supports:
 
 ### Additional Field Support
 
-To support additional field types and special content you can use event handlers for customized import/export functions. To handle export/import of custom field types your plugin/module should listen for the Export/Import events that are triggered from the `BaseContentMigration` class. Refer to the `src/helpers/LinkFieldHelper.php` to see how the export and import events can be used.
+To support additional field types and special content you can use event handlers for customized import/export functions. To handle export/import of custom field types your plugin/module should listen for the Export/Import events that are triggered from the `BaseContentMigration` class. Refer to the [extensions/LinkFieldExtension.php](src/extensions/LinkFieldExtension.php) to see how the export and import events can be used.
 
 Following is the list of element types that the Migration Assistant has events for that allow you to modify the export/import data to support custom fields.
 - Entries

@@ -1,6 +1,6 @@
 <?php
 
-namespace dgrigg\migrationassistant\helpers;
+namespace dgrigg\migrationassistant\extensions;
 
 use Craft;
 use yii\base\Event;
@@ -13,7 +13,7 @@ use dgrigg\migrationassistant\helpers\ElementHelper;
 /**
  * Class LinkFieldHelper
  */
-class LinkFieldHelper
+class LinkFieldExtension
 {
 
     function __construct(){
@@ -48,25 +48,26 @@ class LinkFieldHelper
         Event::on(BaseContentMigration::class, BaseMigration::EVENT_BEFORE_IMPORT_FIELD_VALUE, function (ImportEvent $event) {
             $element = $event->element;
             $value = $event->value;
+            
             if ($element->className() == 'lenz\linkfield\fields\LinkField') {
-            if (key_exists('element', $value)){
-                $ids =  ElementHelper::populateIds($value['element']);
-                if (count($ids) > 0){
-                    $value['linkedId'] = $ids[0];
-                    unset($value['element']);
-                    
+                if (key_exists('element', $value)){
+                    $ids =  ElementHelper::populateIds($value['element']);
+                    if (count($ids) > 0){
+                        $value['linkedId'] = $ids[0];
+                        unset($value['element']);
+                        
+                    }
                 }
-            }
 
-            if (key_exists('site', $value)){
-                $site = Craft::$app->sites->getSiteByHandle($value['site']);
-                if ($site){
-                    $value['linkedSiteId'] = $site->id;
-                    unset($value['site']);
+                if (key_exists('site', $value)){
+                    $site = Craft::$app->sites->getSiteByHandle($value['site']);
+                    if ($site){
+                        $value['linkedSiteId'] = $site->id;
+                        unset($value['site']);
+                    }
                 }
-            }
 
-            $event->value = $value;           
+                $event->value = $value;           
             }
         });
     }
