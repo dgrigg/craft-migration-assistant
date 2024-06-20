@@ -11,6 +11,7 @@ use craft\elements\Tag;
 use craft\elements\User;
 use craft\records\GlobalSet;
 use craft\records\TagGroup;
+use dgrigg\migrationassistant\MigrationAssistant;
 
 /**
  * Class MigrationManagerHelper
@@ -200,7 +201,7 @@ class MigrationHelper
     /**
      * @param array $element
      *
-     * @return BaseElementModel|null
+     * @return TagModel|null
      * @throws Exception
      */
     public static function getTagByHandle($element)
@@ -208,15 +209,18 @@ class MigrationHelper
         $group = Craft::$app->tags->getTagGroupByHandle($element['group']);
         if ($group) {
 
-            $query = Tag::find();
-            $query->groupId($group->id);
-            $query->slug($element['slug']);
-            $tag = $query->one();
-
-            if ($tag) {
+            if (MigrationAssistant::getInstance()->tagContent->importItem($element)) {
+                $query = Tag::find();
+                $query->groupId($group->id);
+                $query->slug($element['slug']);
+                $tag = $query->one();
+                
                 return $tag;
+            } else {
+                return false;
             }
-        }
+        } 
+        return false;
     }
 
     /**

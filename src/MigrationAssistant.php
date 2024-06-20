@@ -76,6 +76,7 @@ class MigrationAssistant extends Plugin
          'entriesContent' => \dgrigg\migrationassistant\services\EntriesContent::class,
          'globalsContent' => \dgrigg\migrationassistant\services\GlobalsContent::class,
          'usersContent' => \dgrigg\migrationassistant\services\UsersContent::class,
+         'tagContent' => \dgrigg\migrationassistant\services\TagContent::class
       ]);
 
       // Register our CP routes
@@ -83,7 +84,6 @@ class MigrationAssistant extends Plugin
          UrlManager::class,
          UrlManager::EVENT_REGISTER_CP_URL_RULES,
          function (RegisterUrlRulesEvent $event) {
-            $event->rules['migrationassistant/migrations/dump'] = 'migrationassistant/migrations/dump';
             $event->rules['migrationassistant/index'] = 'migrationassistant/cp/index';
             $event->rules['migrationassistant/create'] = 'migrationassistant/cp/create';
             $event->rules['migrationassistant'] = 'migrationassistant/cp/index';

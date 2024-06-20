@@ -114,11 +114,9 @@ class UsersContent extends BaseContentMigration
 
                 //photo
                 $this->setPhoto($data, $user);
-              
                 
                 //addresses
                 $this->setAddresses($data, $user);
-
 
                 $this->onAfterImport($event->element, $data);
             } else {
@@ -161,7 +159,7 @@ class UsersContent extends BaseContentMigration
     /**
      * {@inheritdoc}
      */
-    protected function getContent(&$content, $element)
+    public function getContent(&$content, $element)
     {
         parent::getContent($content, $element);
         $this->getPhoto($content, $element);
@@ -179,7 +177,6 @@ class UsersContent extends BaseContentMigration
         if (!is_null($element->photo)){
             $content['photo'] = ElementHelper::getSourceHandle($element->photo);
         }
- 
     }
 
     /**
@@ -263,7 +260,7 @@ class UsersContent extends BaseContentMigration
                     $result = Craft::$app->getElements()->saveElement($address, true, true);
                 
                 } catch (Exception $error){
-                    Craft::error(json_encode($error), __METHOD__);
+                    Craft::error($error, __METHOD__);
                     $this->addError('Failed to save user address');
                 }    
             }

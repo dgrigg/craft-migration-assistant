@@ -98,20 +98,4 @@ class MigrationsController extends Controller
         return $this->redirect('migrationassistant');
     }
 
-    /**
-     * @throws HttpException
-     */
-    public function actionDump()
-    {
-        
-        // Prevent GET Requests
-        //$this->requirePostRequest();
-        $request = Craft::$app->getRequest();
-       
-        MigrationAssistant::getInstance()->migrations->createContentMigration(['user' => [757]]);
-
-        die('dumped');
-
-        
-    }
 }

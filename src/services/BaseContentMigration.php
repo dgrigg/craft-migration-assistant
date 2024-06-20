@@ -10,6 +10,7 @@ use Craft;
 use craft\fields\BaseOptionsField;
 use craft\fields\BaseRelationField;
 use craft\base\Element;
+use craft\fields\Tags;
 use GuzzleHttp\Promise\Is;
 use Throwable;
 
@@ -19,7 +20,7 @@ abstract class BaseContentMigration extends BaseMigration
      * @param $content
      * @param $element
      */
-    protected function getContent(&$content, $element)
+    public function getContent(&$content, $element)
     {
         foreach ($element->getFieldLayout()->getCustomFields() as $fieldModel) {
             $this->getFieldContent($content['fields'], $fieldModel, $element);
@@ -32,7 +33,7 @@ abstract class BaseContentMigration extends BaseMigration
      * @param $parent
      */
 
-    protected function getFieldContent(&$content, $fieldModel, $parent)
+    public function getFieldContent(&$content, $fieldModel, $parent)
     {
         $field = $fieldModel;
         $value = $parent->getFieldValue($field->handle);

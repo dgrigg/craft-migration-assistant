@@ -2,6 +2,7 @@
 
 namespace dgrigg\migrationassistant\helpers;
 
+use Craft;
 use dgrigg\migrationassistant\services\BaseContentMigration;
 
 /**
@@ -72,14 +73,19 @@ class ElementHelper
                 break;
             case 'craft\elements\Tag':
                 $tagValue = [];
-                
                 $service->getContent($tagValue, $element);
                 $item = [
                     'elementType' => $element->className(),
                     'slug' => $element->slug,
+                    'title' => $element->title,
                     'group' => $element->getGroup()->handle,
-                    'value' => $tagValue
+                    'site' => $element->getSite()->handle
                 ];
+
+                if (array_key_exists('fields', $tagValue)){
+                    $item['fields'] = $tagValue['fields'];
+                }
+
                 break;
             case 'craft\elements\User':
                 $item = [
