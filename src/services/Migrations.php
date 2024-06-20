@@ -37,7 +37,7 @@ class Migrations extends Component
         $migration = array(
             'content' => array(),
         );
-
+      
         $empty = true;
         $plugin = MigrationAssistant::getInstance();
 

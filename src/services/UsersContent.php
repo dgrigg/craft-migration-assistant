@@ -3,8 +3,13 @@
 namespace dgrigg\migrationassistant\services;
 
 use Craft;
+use craft\elements\Address;
 use craft\elements\User;
+use craft\base\Element;
+use craft\helpers\ElementHelper as CraftElementHelper;
 use dgrigg\migrationassistant\helpers\MigrationHelper;
+use dgrigg\migrationassistant\helpers\ElementHelper;
+use Exception;
 
 class UsersContent extends BaseContentMigration
 {
@@ -25,19 +30,27 @@ class UsersContent extends BaseContentMigration
     {
         $user = Craft::$app->users->getUserById($id);
 
-        $this->addManifest($id);
+        $this->addManifest($user->username);
 
         if ($user) {
+            $validAttributes = [
+                'admin',
+                'username',
+                'email',
+                'fullName'
+            ];
             $attributes = $user->getAttributes();
-            unset($attributes['id']);
-            unset($attributes['contentId']);
-            unset($attributes['uid']);
-            unset($attributes['siteId']);
+
+            foreach($attributes as $key => $value){
+                if (in_array($key, $validAttributes) == false){
+                    unset($attributes[$key]);
+                }
+            }           
 
             $content = array();
+          
             $this->getContent($content, $user);
             $content = array_merge($content, $attributes);
-
             $content = $this->onBeforeExport($user, $content);
 
             return $content;
@@ -51,7 +64,7 @@ class UsersContent extends BaseContentMigration
      */
     public function importItem(Array $data)
     {
-        Craft::error('IMPORT USER', __METHOD__);
+     
         $user = Craft::$app->users->getUserByUsernameOrEmail($data['username']);
 
         if (!$user){
@@ -84,6 +97,8 @@ class UsersContent extends BaseContentMigration
             $user->setFieldValues($data['fields']);
         }
 
+        
+
         $event = $this->onBeforeImport($user, $data);
         if ($event->isValid) {
 
@@ -96,6 +111,14 @@ class UsersContent extends BaseContentMigration
 
                 $permissions = MigrationHelper::getPermissionIds($data['permissions']);
                 Craft::$app->userPermissions->saveUserPermissions($user->id, $permissions);
+
+                //photo
+                $this->setPhoto($data, $user);
+              
+                
+                //addresses
+                $this->setAddresses($data, $user);
+
 
                 $this->onAfterImport($event->element, $data);
             } else {
@@ -110,6 +133,8 @@ class UsersContent extends BaseContentMigration
             $this->addError($event->error);
             return false;
         }
+
+        //die('imported');
 
         return true;
     }
@@ -139,9 +164,110 @@ class UsersContent extends BaseContentMigration
     protected function getContent(&$content, $element)
     {
         parent::getContent($content, $element);
-
+        $this->getPhoto($content, $element);
+        $this->getAddresses($content, $element);
         $this->getUserGroupHandles($content, $element);
         $this->getUserPermissionHandles($content, $element);
+    }
+
+    /**
+     * @param array $content
+     * @param UserModel $element
+     */
+    private function getPhoto(&$content, $element)
+    {
+        if (!is_null($element->photo)){
+            $content['photo'] = ElementHelper::getSourceHandle($element->photo);
+        }
+ 
+    }
+
+    /**
+     * @param array $data
+     * @param UserModel $element
+     */
+    private function setPhoto($data , $element)
+    {
+        if (array_key_exists('photo', $data) && !is_null($data['photo'])){
+            $asset = [$data['photo']];
+            ElementHelper::populateIds($asset);       
+            if (count($asset) > 0){          
+                $photo = Craft::$app->getAssets()->getAssetById($asset[0]);
+                if ($photo){
+                    $element->setPhoto($photo);
+                    Craft::$app->getElements()->saveElement($element, false);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array $content
+     * @param UserModel $element
+     */
+    private function getAddresses(&$content, $element)
+    {
+        $addresses= $element->getAddresses();
+        $content['addresses'] = [];
+
+        foreach ($addresses as $address) {
+            $addressContent = array();
+
+            $fields = Craft::$app->addresses->getUsedFields($address->countryCode);
+            $addressContent['slug'] = $address->slug;
+            $addressContent['countryCode'] = $address->countryCode;
+            $addressContent['title'] = $address->title;
+            $addressContent['fields'] = [];
+            foreach($fields as $field){
+                $addressContent[$field] = $address[$field];
+            }
+           
+            foreach ($address->getFieldLayout()->getCustomFields() as $field) {
+                $this->getFieldContent($addressContent['fields'], $field, $address);
+
+            }
+            $content['addresses'][] = $addressContent;
+        }      
+    }
+
+    /**
+     * @param array $content
+     * @param UserModel $element
+     */
+    private function setAddresses(&$data, $element)
+    {
+        if (array_key_exists('addresses', $data) && !is_null($data['addresses'])){
+            foreach($data['addresses'] as $addressContent){
+
+                $query = Craft::$app->elements->createElementQuery(Address::class);
+                $query->slug = $addressContent['slug'];
+
+                $address = $query->one();
+                if (!$address){
+                    $address = new Address();
+                    $address->ownerId = $element->id;
+                    $address->slug = $addressContent['slug'];
+                }
+                
+                $address['title'] = $addressContent['title'];
+                $fields = Craft::$app->addresses->getUsedFields($addressContent['countryCode']);
+                foreach($fields as $field){
+                    if (key_exists($field, $addressContent) && !is_null($addressContent[$field])) {
+                        $address[$field] = $addressContent[$field];
+                    }
+                }
+
+                $address->setFieldValues($addressContent['fields']);
+
+                try {
+                    $result = Craft::$app->getElements()->saveElement($address, true, true);
+                
+                } catch (Exception $error){
+                    Craft::error(json_encode($error), __METHOD__);
+                    $this->addError('Failed to save user address');
+                }    
+            }
+        }
     }
 
     /**

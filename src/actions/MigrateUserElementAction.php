@@ -29,7 +29,7 @@ class MigrateUserElementAction extends ElementAction
         $elements = $query->all();
 
         foreach ($elements as $element) {
-            $params['user'][] = $element->id;
+            $params['user'][] =  $element->id;
         }
 
         if (MigrationAssistant::getInstance()->migrations->createContentMigration($params)) {

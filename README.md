@@ -59,7 +59,12 @@ Migration Assistant uses Craft's built in migrator to run migrations. Failed mig
 
 You can also view previously applied migrations by clicking the 'Applied' tab on the migrationassistant/Migrations page. This will show you migrations that have already been applied and migrations that were created locally (and don't need to be run locally). Note that if you create [blank migrations](#custom-migrations) (by clicking the Create Migration button without selecting elements) they will show up in the New Migrations list, so that you have a chance to test and run them locally with your custom migration code.
 
-## Field type support
+## Pending Migration
+You can run the migrations in a variety of ways. The two standard Craft ways are either via the cli ```./craft migrate/all``` or via the Craft CP Utilities Migrations tab. Both of these methods run all available content migrations. There may be instances where you only want to run a single content migration. To do this use the 'Migration Assistant\Migrations' panel in the CP. You have the option to run one, multiple or all available migrations. You can also re-run previously applied migrations if the need arises. 
+
+![Pending Migration](screenshots/migration-assistant-migrations.png)
+
+## Field support
 
 Migration Assistant currently supports all core CraftCMS fields types:
 - Assets
@@ -96,6 +101,7 @@ Following is the list of element types that the Migration Assistant has events f
 - Categories
 - Globals
 - Users
+
 
 ### Using events
 
@@ -163,10 +169,8 @@ Any values in the field data that contains id's should be converted to handles/s
 
 For importing custom fields the imported value should match the fields required input structure. Check the field type's documentation and code for help on determining the correct structure.
 
-## Pending Migration
-You can run the migrations in a variety of ways. The two standard Craft ways are either via the cli ```./craft migrate/all``` or via the Craft CP Utilities Migrations tab. Both of these methods run all available content migrations. There may be instances where you only want to run a single content migration. To do this use the 'Migration Assistant\Migrations' panel in the CP. You have the option to run one, multiple or all available migrations. You can also re-run previously applied migrations if the need arises. 
-
-![Pending Migration](screenshots/migration-assistant-migrations.png)
+## Users
+A special note about User migrations. Only 'content' for users is exported in a migration. This includes the user name, email, any custom field layout values (including addresses) and permissions. No password, user actiation, user login information is migrated. 
 
 ## Permissions
 
