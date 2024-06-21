@@ -149,7 +149,7 @@ class CategoriesContent extends BaseContentMigration
                 ->slug($data['parent'])
                 ->one();
             if ($parent) {
-                $category->newParentId = $parent->id;
+                $category->parentId = $parent->id;
             }
         }
 

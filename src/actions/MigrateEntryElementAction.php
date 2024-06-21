@@ -1,6 +1,5 @@
 <?php
 
-
 namespace dgrigg\migrationassistant\actions;
 use dgrigg\migrationassistant\MigrationAssistant;
 use Craft;

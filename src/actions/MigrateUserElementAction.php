@@ -6,11 +6,8 @@ use Craft;
 use craft\base\ElementAction;
 use craft\elements\db\ElementQueryInterface;
 
-
 class MigrateUserElementAction extends ElementAction
 {
-
-
     /**
      * @inheritdoc
      */

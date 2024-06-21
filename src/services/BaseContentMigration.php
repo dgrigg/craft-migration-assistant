@@ -2,16 +2,14 @@
 
 namespace dgrigg\migrationassistant\services;
 
-use dgrigg\migrationassistant\helpers\MigrationHelper;
 use dgrigg\migrationassistant\helpers\ElementHelper;
 use dgrigg\migrationassistant\events\ExportEvent;
 use dgrigg\migrationassistant\events\ImportEvent;
+
 use Craft;
 use craft\fields\BaseOptionsField;
 use craft\fields\BaseRelationField;
-use craft\base\Element;
-use craft\fields\Tags;
-use GuzzleHttp\Promise\Is;
+
 use Throwable;
 
 abstract class BaseContentMigration extends BaseMigration
@@ -155,12 +153,18 @@ abstract class BaseContentMigration extends BaseMigration
         $field = Craft::$app->fields->getFieldByHandle($fieldHandle, $context);
         if ($field) {
             if ($field instanceof BaseRelationField) {
-                ElementHelper::populateIds($fieldValue);
+               
+                if (is_array($fieldValue)){
+                    ElementHelper::populateIds($fieldValue);
+                } else {
+                    $fieldValues = [$fieldValue];
+                    ElementHelper::populateIds($fieldValues);
+                }
             } else {
                 switch ($field::class) {
                     case 'craft\fields\Matrix':
                         foreach ($fieldValue as $key => &$matrixBlock) {
-                            $blockType = MigrationHelper::getMatrixBlockType($matrixBlock['type'], $field->id);
+                            $blockType = ElementHelper::getMatrixBlockType($matrixBlock['type'], $field->id);
                             if ($blockType) {
                                 $blockFields = Craft::$app->fields->getAllFields('matrixBlockType:' . $blockType->id);
                                 foreach ($blockFields as &$blockField) {
@@ -176,7 +180,7 @@ abstract class BaseContentMigration extends BaseMigration
 
                     case 'benf\neo\Field':
                         foreach ($fieldValue as $key => &$neoBlock) {
-                            $blockType = MigrationHelper::getNeoBlockType($neoBlock['type'], $field->id);
+                            $blockType = ElementHelper::getNeoBlockType($neoBlock['type'], $field->id);
                             if ($blockType) {
                                 $blockFields = $blockType->getFieldLayout()->getCustomFields();
                                 foreach ($blockFields as &$blockTabField) {

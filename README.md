@@ -135,14 +135,14 @@ Event::on(Fields::class, Fields::EVENT_BEFORE_EXPORT_ELEMENT, function(ExportEve
 
 During the import you can modify the data before it is imported or deal with the element after it has been imported and either created or updated.
 
-Before import, the $event->element is the element model (based on handle match) to be imported (updated or created). The $event->value property is the raw data used to populate the element model. You can change properties in the $event->element and $event->value to affect the imported data. Refer to the [LinkFieldHelper.php](src/helpers/LinkFieldHelper.php) for an example
+Before import, the $event->element is the element model (based on handle match) to be imported (updated or created). The $event->value property is the raw data used to populate the element model. You can change properties in the $event->element and $event->value to affect the imported data. Refer to the [extensions/LinkFieldExtension.php](src/extensions/LinkFieldExtension.php) for an example
 
 
 ```php
 //Custom fields
 Event::on(Fields::class, Fields::EVENT_BEFORE_IMPORT_ELEMENT, function(ExportEvent $event) {
    $element = $event->element;
-   $element->special_setting = $event->value['settings']['special_setting'];
+   $element->special_value = $event->value['special_setting'];
    $event->element = $element;
 });
 ```
@@ -151,7 +151,7 @@ After import you can access the $event->element and $event->value to perform add
 
 ```php
 Event::on(Fields::class, Fields::EVENT_AFTER_IMPORT_ELEMENT, function(ExportEvent $event) {
-   $event->value['typesettings']['special_setting'] = 'some special setting value';
+   $event->value['special_value'] = 'some special value';
 });
 ```
 
@@ -161,7 +161,7 @@ You can also cancel an import if needed and provide an error message. Error mess
 //Custom fields
 Event::on(Fields::class, Fields::EVENT_BEFORE_IMPORT_ELEMENT, function(ExportEvent $event) {
     $event->isValid = false;
-    $event->error = 'my reason for cancelling';
+    $event->error = 'my reason for cancelling the imort';
 });
 ```
 

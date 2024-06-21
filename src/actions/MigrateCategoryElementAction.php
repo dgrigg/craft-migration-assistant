@@ -5,6 +5,7 @@ use dgrigg\migrationassistant\MigrationAssistant;
 use Craft;
 use craft\base\ElementAction;
 use craft\elements\db\ElementQueryInterface;
+
 /**
  * Class MigrationManager_MigrateCategoryElementAction
  */
@@ -17,7 +18,6 @@ class MigrateCategoryElementAction extends ElementAction
     {
         return Craft::t('app', 'Create Migration');
     }
-
 
     /**
      * {@inheritdoc}

@@ -7,7 +7,6 @@ use craft\elements\Address;
 use craft\elements\User;
 use craft\base\Element;
 use craft\helpers\ElementHelper as CraftElementHelper;
-use dgrigg\migrationassistant\helpers\MigrationHelper;
 use dgrigg\migrationassistant\helpers\ElementHelper;
 use Exception;
 
@@ -109,7 +108,7 @@ class UsersContent extends BaseContentMigration
                 $groups = $this->getUserGroupIds($data['groups']);
                 Craft::$app->users->assignUserToGroups($user->id, $groups);
 
-                $permissions = MigrationHelper::getPermissionIds($data['permissions']);
+                $permissions = ElementHelper::getPermissionIds($data['permissions']);
                 Craft::$app->userPermissions->saveUserPermissions($user->id, $permissions);
 
                 //photo
@@ -305,7 +304,7 @@ class UsersContent extends BaseContentMigration
     private function getUserPermissionHandles(&$content, $element)
     {
         $permissions = Craft::$app->userPermissions->getPermissionsByUserId($element->id);
-        $permissions = MigrationHelper::getPermissionHandles($permissions);
+        $permissions = ElementHelper::getPermissionHandles($permissions);
         $content['permissions'] = $permissions;
     }
 }
