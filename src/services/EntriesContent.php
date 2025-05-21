@@ -19,7 +19,6 @@ class EntriesContent extends BaseContentMigration
      */
     public function exportItem($element, $fullExport = false)
     {
-       
         $primaryEntry = Craft::$app->entries->getEntryById($element->id, $element->siteId);
 
         if ($primaryEntry) {

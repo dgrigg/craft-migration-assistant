@@ -24,60 +24,63 @@ class CKFieldExtension
         
             $element = $event->element;
             if ($element->className() == 'craft\ckeditor\Field') {
-
                 $value = $event->value;
                 $service = $event->service;
                 $values = [];
-                foreach($value as $key => $chunk){
-                    switch ($chunk->getType()){
-                        case 'entry':
-                            $chunkContent = [];
-                            $service->getContent($chunkContent, $chunk->getEntry());
-                            $handle = ElementHelper::getElementHandle($chunk->getEntry());
-                            $handle['content'] = $chunkContent;
-                            $handle['entryId'] = $chunk->getEntry()->id;
-                            $values[] = $handle;
-                            break;
-                        case 'markup';
-                            //replace the linked elements with handles   
-                            $pattern = "/{(entry|asset|category):(\d+)\@(\d):(.*?)}/";
-                            $html = preg_replace_callback($pattern, function($matches){
-                                switch ($matches[1]) {
-                                    case 'entry':
-                                        $query = Entry::find();
-                                        $query->elementType = Entry::class;
-                                        $query->with(['section']);
-                                        break;
-                                    case 'category':
-                                        $query = Category::find();
-                                        $query->elementType = Category::class;
-                                        break;
-                                    case 'asset':
-                                        $query = Asset::find();
-                                        $query->elementType = Asset::class;
-                                        break;
-                                };
+                if ($value !== null){
+                    foreach($value as $key => $chunk){
+                        switch ($chunk->getType()){
+                            case 'entry':
+                                $chunkContent = [];
+                                $service->getContent($chunkContent, $chunk->getEntry());
+                                $handle = ElementHelper::getElementHandle($chunk->getEntry());
+                                $handle['content'] = $chunkContent;
+                                $handle['entryId'] = $chunk->getEntry()->id;
+                                $values[] = $handle;
+                                break;
+                            case 'markup';
+                                //replace the linked elements with handles
+                                $pattern = "/{(entry|asset|category):(\d+)\@(\d):(.*?)}/";
+                                $html = preg_replace_callback($pattern, function($matches){
+                                    switch ($matches[1]) {
+                                        case 'entry':
+                                            $query = Entry::find();
+                                            $query->elementType = Entry::class;
+                                            $query->with(['section']);
+                                            break;
+                                        case 'category':
+                                            $query = Category::find();
+                                            $query->elementType = Category::class;
+                                            break;
+                                        case 'asset':
+                                            $query = Asset::find();
+                                            $query->elementType = Asset::class;
+                                            break;
+                                    };
 
-                                $query->id = $matches[2];
-                                $query->siteId = $matches[3];
-                                $element = $query->one();
-                                
-                                if ($element){
-                                    $handle = ElementHelper::getSourceHandle($element);
-                                    if ($handle){
-                                        $handle = json_encode($handle);
-                                        return "{element:{$handle}}";
+                                    $query->id = $matches[2];
+                                    $query->siteId = $matches[3];
+                                    $element = $query->one();
+
+                                    if ($element){
+                                        $handle = ElementHelper::getSourceHandle($element);
+                                        if ($handle){
+                                            $handle = json_encode($handle);
+                                            return "{element:{$handle}}";
+                                        } else {
+                                            return "{element:not-found-1}";
+                                        }
                                     } else {
-                                        return "{element:not-found-1}";
+                                        return "{element:not-found-2}";
                                     }
-                                } else {
-                                    return "{element:not-found-2}";
-                                }
-                            }, $chunk->rawHtml);
-                            $chunk->rawHtml = $html;    
-                            $values[] = $chunk;                       
-                            break;
+                                }, $chunk->rawHtml);
+                                $chunk->rawHtml = $html;
+                                $values[] = $chunk;
+                                break;
+                        }
                     }
+                } else {
+                    $value = [];
                 }
                 $event->value = $values;
             }

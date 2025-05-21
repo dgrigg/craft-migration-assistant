@@ -98,7 +98,6 @@ In addition it also supports:
 - [Neo](https://github.com/spicywebau/craft-neo)
 - [LinkField](https://github.com/sebastian-lenz/craft-linkfield)
 - [Hyper](https://github.com/verbb/hyper)
-- [Hyper](https://github.com/verbb/hyper)
 - [CK Editor](https://github.com/craftcms/ckeditor)
 
 ### Additional Field Support

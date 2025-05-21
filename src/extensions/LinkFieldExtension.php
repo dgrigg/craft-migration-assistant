@@ -17,10 +17,9 @@ class LinkFieldExtension
     function __construct(){
 
         Event::on(BaseMigration::class, BaseMigration::EVENT_BEFORE_EXPORT_FIELD_VALUE, function (ExportEvent $event) {
-        
             $element = $event->element;
-            if ($element->className() == 'lenz\linkfield\fields\LinkField') {
 
+            if ($element->className() == 'lenz\linkfield\fields\LinkField') {
                 $value = $event->value;
                 $linkType = $value->getLinkType();               
                 $value = (object)(array) $value;
@@ -32,8 +31,8 @@ class LinkFieldExtension
                 } 
 
                 if (isset($value->linkedSiteId) && !is_null($value->linkedSiteId)) {
-                $site = Craft::$app->sites->getSiteById($value->linkedSiteId);
-                $value->site = $site->handle;
+                    $site = Craft::$app->sites->getSiteById($value->linkedSiteId);
+                    $value->site = $site->handle;
                 }
 
                 unset($value->linkedId);

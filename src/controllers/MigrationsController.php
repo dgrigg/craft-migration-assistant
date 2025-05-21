@@ -26,7 +26,6 @@ class MigrationsController extends Controller
 
         if (MigrationAssistant::getInstance()->migrations->createMigration(null, [], $post['migrationName'])) {
             Craft::$app->getSession()->setNotice(Craft::t('migrationassistant', 'Migration created.'));
-
         } else {
             Craft::$app->getSession()->setError(Craft::t('migrationassistant', 'Could not create migration, check log tab for errors.'));
         }

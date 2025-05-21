@@ -32,7 +32,7 @@ abstract class BaseContentMigration extends BaseMigration
     public function getFieldContent(&$content, $fieldModel, $parent)
     {
         $field = $fieldModel;
-        $value = $parent->getFieldValue($field->handle); 
+        $value = $parent->getFieldValue($field->handle);
 
         switch ($field->className()) {
             case 'craft\redactor\Field':
@@ -123,11 +123,11 @@ abstract class BaseContentMigration extends BaseMigration
         }
 
         if (is_object($value)) {
-            $value = (array) $value;
+            $value = json_decode(json_encode($value), true);
         }
 
-        $value['context'] = $field->context; 
-        
+        $value['context'] = $field->context;
+
         //set the field context              
         $content[$field->handle] = $value;
     }

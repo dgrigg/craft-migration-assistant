@@ -20,7 +20,6 @@ class MigrateEntryElementAction extends ElementAction
         return Craft::t('app', 'Create Migration');
     }
 
-
     /**
      * {@inheritdoc}
      */

@@ -1,5 +1,12 @@
 # Migration Assistant Changelog
 
+## 5.0.1 - 2025-05-21
+
+### Fixed
+
+- Empty CK Editor fields no longer throw null exception
+- Fixed error exporting LinkField data
+
 ## 5.0.0 - 2024-07-24
 
 ### Added
