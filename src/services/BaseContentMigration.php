@@ -2,6 +2,7 @@
 
 namespace dgrigg\migrationassistant\services;
 
+use craft\services\Fields;
 use dgrigg\migrationassistant\helpers\ElementHelper;
 use dgrigg\migrationassistant\events\ExportEvent;
 use dgrigg\migrationassistant\events\ImportEvent;
@@ -128,6 +129,11 @@ abstract class BaseContentMigration extends BaseMigration
 
         $value['context'] = $field->context;
 
+        $originalField =  Craft::$app->getFields()->getFieldByUid($field->uid);
+        if ($originalField->handle != $field->handle) {
+            $value['originalHandle'] = $originalField->handle;
+        }
+
         //set the field context              
         $content[$field->handle] = $value;
     }
@@ -172,9 +178,14 @@ abstract class BaseContentMigration extends BaseMigration
 
     protected function validateFieldValue($parent, $fieldHandle, &$fieldValue, $ownerId)
     {
-        $field = Craft::$app->fields->getFieldByHandle($fieldHandle, $fieldValue['context']);
+        if (array_key_exists('originalHandle', $fieldValue)) {
+            $field = Craft::$app->fields->getFieldByHandle($fieldValue['originalHandle'], $fieldValue['context']);
+            unset($fieldValue['originalHandle']);
+        } else {
+            $field = Craft::$app->fields->getFieldByHandle($fieldHandle, $fieldValue['context']);
+        }
 
-        if ($field) {
+        if ($field != null && $field !== false) {
             //remove the context value
             unset($fieldValue['context']);
 
@@ -233,7 +244,9 @@ abstract class BaseContentMigration extends BaseMigration
 
             $value = $this->onBeforeImportFieldValue($field, $fieldValue, $ownerId);
             $fieldValue = $value;
-        } 
+        } else {
+            Craft::error('Migration assistant can not find field: ' . $fieldHandle, __METHOD__);
+        }
     }
 
     /**

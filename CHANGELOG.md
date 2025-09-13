@@ -1,5 +1,11 @@
 # Migration Assistant Changelog
 
+## 5.0.2 - 2025-09-13 
+
+### Fixed
+
+- Fixed error with field layout fields that were using different handles than the original field's value 
+- 
 ## 5.0.1 - 2025-05-21
 
 ### Fixed
