@@ -10,6 +10,7 @@ use Craft;
 use craft\fields\BaseOptionsField;
 use craft\fields\BaseRelationField;
 use craft\helpers\MoneyHelper;
+use const _PHPStan_27631a2e0\__;
 
 abstract class BaseContentMigration extends BaseMigration
 {
@@ -56,12 +57,21 @@ abstract class BaseContentMigration extends BaseMigration
                         'title' => $item->title,
                         'slug' => $item->slug,
                         'collapsed' => $item->collapsed,
-                        'fields' => []                        
+                        'fields' => []
                     ];
 
                     return $value;
                 });
                 break;
+            case 'craft\fields\ContentBlock':
+                $itemFields = $field->getFieldLayout()->getCustomFields();
+                $fields = [];
+                foreach ($itemFields as $itemField) {
+                    $this->getFieldContent($fields, $itemField, $value);
+                }
+                $value = ['fields' => $fields];
+                break;
+
             case 'benf\neo\Field':
                 $model = $parent[$field->handle];
                 $value = $this->getIteratorValues($model, function ($item) {
@@ -197,6 +207,7 @@ abstract class BaseContentMigration extends BaseMigration
                     ElementHelper::populateIds($fieldValues);
                 }
             } else {
+
                 switch ($field::class) {
                     case 'craft\fields\Matrix':
                         foreach ($fieldValue as $key => &$matrixBlock) {
@@ -213,7 +224,9 @@ abstract class BaseContentMigration extends BaseMigration
                             }
                         }
                         break;
-
+                    case 'craft\fields\ContentBlock':
+                        $this->validateImportValues($fieldValue['fields'], $ownerId);
+                        break;
                     case 'benf\neo\Field':
                         foreach ($fieldValue as $key => &$neoBlock) {
                             $blockType = ElementHelper::getNeoBlockType($neoBlock['type'], $field->id);

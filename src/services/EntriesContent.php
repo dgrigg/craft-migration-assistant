@@ -105,7 +105,6 @@ class EntriesContent extends BaseContentMigration
               if ($siteEntry){
                 $value['id'] = $siteEntry->id;
               }
-
             }
 
             $entry = $this->createModel($value);
