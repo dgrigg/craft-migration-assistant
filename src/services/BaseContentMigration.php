@@ -113,7 +113,16 @@ abstract class BaseContentMigration extends BaseMigration
                 break;
             case 'craft\fields\Addresses':
                 $addresses = $field->serializeValue($value, $parent );
-                $value = array_values($addresses);
+                $value = array_valcraft\fields\Linkues($addresses);
+                break;
+            case 'craft\fields\Link':
+                $link = $field->serializeValue($value, $parent );
+                $element = $value?->getElement();
+                if ($element) {
+                    $item = ElementHelper::getSourceHandle($element, $this);
+                    $link['value'] = $item;
+                }
+                $value = $link;
                 break;
             default:
                 if ($field instanceof BaseRelationField) {
@@ -227,6 +236,22 @@ abstract class BaseContentMigration extends BaseMigration
                     case 'craft\fields\ContentBlock':
                         $this->validateImportValues($fieldValue['fields'], $ownerId);
                         break;
+                    case 'craft\fields\Link':
+                        if (is_array($fieldValue['value'])){
+                            $handle = $fieldValue['value'];
+                            $element = ElementHelper::getElementByHandle($handle);
+                            $link = "";
+                            //convert link format to {entry:{entryId}@{siteId}:ur}}
+                            if ($element){
+                                $link = "{{$element::lowerDisplayName()}:{$element->id}@{$element->site->id}:url}";
+                            }
+                        } else {
+                            $link = $fieldValue['value'];
+                        }
+                        $fieldValue[$fieldValue['type']]['value'] = $link;
+                        unset($fieldValue['value']);
+
+                        break;
                     case 'benf\neo\Field':
                         foreach ($fieldValue as $key => &$neoBlock) {
                             $blockType = ElementHelper::getNeoBlockType($neoBlock['type'], $field->id);
@@ -279,6 +304,7 @@ abstract class BaseContentMigration extends BaseMigration
             'ownerId' => $ownerId,
             'service' => $this
         ));
+
         $this->trigger($this::EVENT_BEFORE_IMPORT_FIELD_VALUE, $event);
         return $event->value;
     }
