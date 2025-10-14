@@ -1,5 +1,11 @@
 # Migration Assistant Changelog
 
+## 5.0.4 - 2025-10-14 
+
+### Fixed
+
+- Fixed issue with empty fields in Link field migrations 
+
 ## 5.0.3 - 2025-10-13
 
 ### Added

@@ -73,6 +73,7 @@ Migration Assistant currently supports all core CraftCMS fields types:
 - Categories
 - Checkboxes
 - Color
+- Content Block
 - Country
 - Date
 - Dropdown
@@ -80,6 +81,7 @@ Migration Assistant currently supports all core CraftCMS fields types:
 - Entries
 - Icon
 - Lightswitch
+- Link
 - Matrix
 - Money
 - Multi-select
