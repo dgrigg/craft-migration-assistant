@@ -1,5 +1,17 @@
 # Migration Assistant Changelog
 
+## 5.0.6 - 2025-10-14
+
+### Fixed
+
+- Fixed issue with null link type on Link fields
+
+## 5.0.5 - 2025-10-14 
+
+### Fixed
+
+- Version bump 
+
 ## 5.0.4 - 2025-10-14 
 
 ### Fixed

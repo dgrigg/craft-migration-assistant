@@ -248,7 +248,9 @@ abstract class BaseContentMigration extends BaseMigration
                         } else {
                             $link = $fieldValue['value'];
                         }
-                        $fieldValue[$fieldValue['type']]['value'] = $link;
+                        if (isset($fieldValue['type'])) {
+                            $fieldValue[$fieldValue['type']]['value'] = $link;
+                        }
                         unset($fieldValue['value']);
 
                         break;
