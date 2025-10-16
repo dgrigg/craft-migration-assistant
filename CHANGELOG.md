@@ -1,5 +1,11 @@
 # Migration Assistant Changelog
 
+## 5.0.7 - 2025-10-15
+
+### Fixed
+
+- Fixed unknown property error on child entries
+
 ## 5.0.6 - 2025-10-14
 
 ### Fixed

@@ -187,19 +187,11 @@ class EntriesContent extends BaseContentMigration
             $query->status(null);
             $parent = $query->one();
             if ($parent) {
-                $entry->newParentId = $parent->id;
+                $entry->parentId = $parent->id;
             }
         }
 
         $entry->title = $data['title'];
-
-        //grab the content id for existing entries
-        // if (!is_null($entry->id)){
-        //     $contentEntry = Craft::$app->entries->getEntryById($entry->id, $entry->siteId);
-        //     if ($contentEntry) {
-        //         $entry->contentId = $contentEntry->contentId;
-        //     }
-        // }
 
         return $entry;
     }
